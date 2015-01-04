@@ -57,7 +57,6 @@ public:
 		dbus_pending_call_block(v_value);
 		DBusMessage* message = dbus_pending_call_steal_reply(v_value);
 		if (message == NULL) t_throwable::f_throw(L"dbus_pending_call_steal_reply failed.");
-		while (dbus_connection_dispatch(v_connection) == DBUS_DISPATCH_DATA_REMAINS);
 		return t_message::f_construct(message);
 	}
 };
