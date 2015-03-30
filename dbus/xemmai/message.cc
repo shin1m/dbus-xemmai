@@ -119,7 +119,7 @@ void t_type_of<t_message>::f_finalize(t_object* a_this)
 	delete p;
 }
 
-t_scoped t_type_of<t_message>::f_construct(t_object* a_class, t_slot* a_stack, size_t a_n)
+t_scoped t_type_of<t_message>::f_construct(t_object* a_class, t_scoped* a_stack, size_t a_n)
 {
 	return t_overload<
 		t_construct_with<t_scoped (*)(t_object*, const std::wstring*, const std::wstring&, const std::wstring*, const std::wstring&), t_message::f_construct>,
@@ -129,7 +129,7 @@ t_scoped t_type_of<t_message>::f_construct(t_object* a_class, t_slot* a_stack, s
 	>::t_bind<t_message>::f_do(a_class, a_stack, a_n);
 }
 
-void t_type_of<t_message>::f_instantiate(t_object* a_class, t_slot* a_stack, size_t a_n)
+void t_type_of<t_message>::f_instantiate(t_object* a_class, t_scoped* a_stack, size_t a_n)
 {
 	a_stack[0].f_construct(f_construct(a_class, a_stack, a_n));
 	for (size_t i = 1; i <= a_n; ++i) a_stack[i] = nullptr;

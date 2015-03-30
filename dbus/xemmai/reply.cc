@@ -39,18 +39,18 @@ void t_type_of<t_reply>::f_finalize(t_object* a_this)
 	delete p;
 }
 
-t_scoped t_type_of<t_reply>::f_construct(t_object* a_class, t_slot* a_stack, size_t a_n)
+t_scoped t_type_of<t_reply>::f_construct(t_object* a_class, t_scoped* a_stack, size_t a_n)
 {
 	t_throwable::f_throw(L"uninstantiatable.");
 }
 
-void t_type_of<t_reply>::f_instantiate(t_object* a_class, t_slot* a_stack, size_t a_n)
+void t_type_of<t_reply>::f_instantiate(t_object* a_class, t_scoped* a_stack, size_t a_n)
 {
 	a_stack[0].f_construct(f_construct(a_class, a_stack, a_n));
 	for (size_t i = 1; i <= a_n; ++i) a_stack[i] = nullptr;
 }
 
-void t_type_of<t_reply>::f_call(t_object* a_this, t_slot* a_stack, size_t a_n)
+void t_type_of<t_reply>::f_call(t_object* a_this, t_scoped* a_stack, size_t a_n)
 {
 	t_native_context context;
 	a_stack[0].f_construct(f_as<t_reply&>(a_this)());
