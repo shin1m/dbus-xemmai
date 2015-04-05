@@ -50,11 +50,12 @@ void t_type_of<t_reply>::f_instantiate(t_object* a_class, t_scoped* a_stack, siz
 	for (size_t i = 1; i <= a_n; ++i) a_stack[i] = nullptr;
 }
 
-void t_type_of<t_reply>::f_call(t_object* a_this, t_scoped* a_stack, size_t a_n)
+size_t t_type_of<t_reply>::f_call(t_object* a_this, t_scoped* a_stack, size_t a_n)
 {
 	t_native_context context;
 	a_stack[0].f_construct(f_as<t_reply&>(a_this)());
 	context.f_done();
+	return -1;
 }
 
 }
