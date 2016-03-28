@@ -1,9 +1,9 @@
-AC_INIT([dbus-xemmai], [201512])
+AC_INIT([dbus-xemmai], [201603])
 AM_INIT_AUTOMAKE([foreign nostdinc dist-bzip2 no-dist-gzip])
 AC_CONFIG_SRCDIR([dbus/xemmai/dbus.cc])
 
 PKG_CHECK_MODULES([DBUS], [dbus-1 >= 1.8])
-XEMMAI_USE=xemmai-201512
+XEMMAI_USE=xemmai-201603
 PKG_CHECK_MODULES([XEMMAI], [${XEMMAI_USE}], [
 	XEMMAI_MODULE_PATH=`pkg-config --variable=module_path ${XEMMAI_USE}`
 ])

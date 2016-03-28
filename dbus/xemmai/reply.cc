@@ -54,9 +54,7 @@ void t_type_of<t_reply>::f_instantiate(t_object* a_class, t_scoped* a_stack, siz
 size_t t_type_of<t_reply>::f_call(t_object* a_this, t_scoped* a_stack, size_t a_n)
 {
 	if (a_n > 0) t_throwable::f_throw(L"must be called without an argument.");
-	t_native_context context;
 	a_stack[0].f_construct(f_as<t_reply&>(a_this)());
-	context.f_done();
 	return -1;
 }
 
