@@ -102,7 +102,7 @@ void t_type_of<t_connection>::f_finalize(t_object* a_this)
 	delete p;
 }
 
-t_scoped t_type_of<t_connection>::f_construct(t_object* a_class, t_scoped* a_stack, size_t a_n)
+t_scoped t_type_of<t_connection>::f_construct(t_object* a_class, t_stacked* a_stack, size_t a_n)
 {
 	return t_overload<
 		t_construct_with<t_scoped (*)(t_object*, DBusBusType), t_connection::f_construct>,
@@ -110,11 +110,10 @@ t_scoped t_type_of<t_connection>::f_construct(t_object* a_class, t_scoped* a_sta
 	>::t_bind<t_connection>::f_do(a_class, a_stack, a_n);
 }
 
-void t_type_of<t_connection>::f_instantiate(t_object* a_class, t_scoped* a_stack, size_t a_n)
+void t_type_of<t_connection>::f_instantiate(t_object* a_class, t_stacked* a_stack, size_t a_n)
 {
+	t_destruct_n destruct(a_stack, a_n);
 	a_stack[0].f_construct(f_construct(a_class, a_stack, a_n));
-	a_n += 2;
-	for (size_t i = 2; i < a_n; ++i) a_stack[i] = nullptr;
 }
 
 }
