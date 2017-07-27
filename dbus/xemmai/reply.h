@@ -29,6 +29,12 @@ class t_reply : public t_proxy_of<t_reply, DBusPendingCall>
 	{
 		dbus_pending_call_unref(a_value);
 	}
+	static t_scoped f_steal(DBusPendingCall* a_value)
+	{
+		auto message = dbus_pending_call_steal_reply(a_value);
+		if (message == NULL) t_throwable::f_throw(L"dbus_pending_call_steal_reply failed.");
+		return t_message::f_construct(message);
+	}
 
 	DBusConnection* v_connection;
 
@@ -44,6 +50,7 @@ public:
 		return a_value == NULL ? nullptr : f_transfer(new t_reply(a_value, a_connection));
 	}
 
+	virtual void f_dispose();
 	void f_acquire()
 	{
 		t_base::f_acquire();
@@ -55,9 +62,24 @@ public:
 	t_scoped operator()()
 	{
 		dbus_pending_call_block(v_value);
-		DBusMessage* message = dbus_pending_call_steal_reply(v_value);
-		if (message == NULL) t_throwable::f_throw(L"dbus_pending_call_steal_reply failed.");
-		return t_message::f_construct(message);
+		return f_steal(v_value);
+	}
+	void operator()(t_scoped&& a_callable)
+	{
+		if (dbus_pending_call_set_notify(v_value, [](auto a_pending, auto a_data)
+		{
+			auto result = f_steal(a_pending);
+			try {
+				(*static_cast<t_scoped*>(a_data))(result);
+				f_as<t_message&>(result).f_release();
+			} catch (...) {
+				f_as<t_message&>(result).f_release();
+				throw;
+			}
+		}, new t_scoped(std::move(a_callable)), [](auto a_data)
+		{
+			delete static_cast<t_scoped*>(a_data);
+		}) == FALSE) t_throwable::f_throw(L"dbus_pending_call_set_notify failed.");
 	}
 };
 

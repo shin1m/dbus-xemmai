@@ -209,7 +209,7 @@ dbus_int32_t t_proxy_of<T, T_value>::v_slot = -1;
 template<typename T, typename T_value>
 void t_proxy_of<T, T_value>::f_dispose()
 {
-//	std::fprintf(stderr, "dispose %s(%p)\n", typeid(v_value).name(), v_value);
+//	std::fprintf(stderr, "dispose %s(%p) %d\n", typeid(v_value).name(), v_value, v_n);
 	t_proxy::f_dispose();
 	if (v_n > 0) {
 		v_n = 0;

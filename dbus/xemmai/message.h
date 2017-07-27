@@ -30,6 +30,8 @@ class t_message : public t_proxy_of<t_message, DBusMessage>
 		dbus_message_unref(a_value);
 	}
 
+	DBusMessageIter* v_i = nullptr;
+
 	t_message(DBusMessage* a_value) : t_base(t_session::f_instance()->f_extension()->f_type<t_message>(), a_value)
 	{
 	}
@@ -81,11 +83,19 @@ public:
 		return dbus_message_get_type(v_value);
 	}
 	t_scoped f_get();
+	t_scoped f_append(int a_type, const void* a_value)
+	{
+		if (v_i) {
+			if (dbus_message_iter_append_basic(v_i, a_type, a_value) != TRUE) t_throwable::f_throw(L"dbus_message_iter_append_basic failed.");
+		} else {
+			if (dbus_message_append_args(v_value, a_type, a_value, DBUS_TYPE_INVALID) != TRUE) t_throwable::f_throw(L"dbus_message_append_args failed.");
+		}
+		return f_object();
+	}
 	t_scoped f_append(bool a_value)
 	{
 		dbus_bool_t value = a_value ? TRUE : FALSE;
-		if (dbus_message_append_args(v_value, DBUS_TYPE_BOOLEAN, &value, DBUS_TYPE_INVALID) != TRUE) t_throwable::f_throw(L"dbus_message_append_args failed.");
-		return f_object();
+		return f_append(DBUS_TYPE_BOOLEAN, &value);
 	}
 	t_scoped f_append(int a_type, intptr_t a_value)
 	{
@@ -97,12 +107,10 @@ public:
 		case DBUS_TYPE_UINT32:
 		case DBUS_TYPE_INT64:
 		case DBUS_TYPE_UINT64:
-			break;
+			return f_append(a_type, &a_value);
 		default:
 			t_throwable::f_throw(L"invalid type.");
 		}
-		if (dbus_message_append_args(v_value, a_type, &a_value, DBUS_TYPE_INVALID) != TRUE) t_throwable::f_throw(L"dbus_message_append_args failed.");
-		return f_object();
 	}
 	t_scoped f_append(intptr_t a_value)
 	{
@@ -110,8 +118,7 @@ public:
 	}
 	t_scoped f_append(double a_value)
 	{
-		if (dbus_message_append_args(v_value, DBUS_TYPE_DOUBLE, &a_value, DBUS_TYPE_INVALID) != TRUE) t_throwable::f_throw(L"dbus_message_append_args failed.");
-		return f_object();
+		return f_append(DBUS_TYPE_DOUBLE, &a_value);
 	}
 	t_scoped f_append(int a_type, const std::wstring& a_value)
 	{
@@ -125,12 +132,32 @@ public:
 		}
 		std::string value = f_convert(a_value);
 		const char* p = value.c_str();
-		if (dbus_message_append_args(v_value, a_type, &p, DBUS_TYPE_INVALID) != TRUE) t_throwable::f_throw(L"dbus_message_append_args failed.");
-		return f_object();
+		return f_append(a_type, &p);
 	}
 	t_scoped f_append(const std::wstring& a_value)
 	{
 		return f_append(DBUS_TYPE_STRING, a_value);
+	}
+	t_scoped f_append(int a_type, const char* a_signature, const t_value& a_callable);
+	t_scoped f_append(int a_type, const std::wstring& a_signature, const t_value& a_callable)
+	{
+		switch (a_type) {
+		case DBUS_TYPE_ARRAY:
+		case DBUS_TYPE_VARIANT:
+			return f_append(a_type, f_convert(a_signature).c_str(), a_callable);
+		default:
+			t_throwable::f_throw(L"invalid type.");
+		}
+	}
+	t_scoped f_append(int a_type, const t_value& a_callable)
+	{
+		switch (a_type) {
+		case DBUS_TYPE_STRUCT:
+		case DBUS_TYPE_DICT_ENTRY:
+			return f_append(a_type, NULL, a_callable);
+		default:
+			t_throwable::f_throw(L"invalid type.");
+		}
 	}
 };
 

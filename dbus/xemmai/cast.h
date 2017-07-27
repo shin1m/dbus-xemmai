@@ -3,7 +3,7 @@
 	{
 		static T0* f_call(T1 a_object)
 		{
-			T0* p = static_cast<T0*>(f_object(a_object)->f_pointer());
+			auto p = static_cast<T0*>(f_object(a_object)->f_pointer());
 			if (!p->f_valid()) t_throwable::f_throw(L"accessing from other thread.");
 			if (!*p) t_throwable::f_throw(L"already destroyed.");
 			return p;

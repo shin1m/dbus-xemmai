@@ -11,7 +11,7 @@ namespace xemmai
 DBusHandlerResult t_connection::f_filter(DBusConnection* a_connection, DBusMessage* a_message, void* a_data)
 {
 std::fprintf(stderr, "filter: %d, %s, %s, %s\n", dbus_message_get_type(a_message), dbus_message_get_path(a_message), dbus_message_get_interface(a_message), dbus_message_get_member(a_message));
-	t_connection* p = static_cast<t_connection*>(a_data);
+	auto p = static_cast<t_connection*>(a_data);
 	const char* path = dbus_message_get_path(a_message);
 	const char* interface = dbus_message_get_interface(a_message);
 	const char* member = dbus_message_get_member(a_message);
@@ -97,7 +97,7 @@ t_type* t_type_of<t_connection>::f_derive(t_object* a_this)
 
 void t_type_of<t_connection>::f_finalize(t_object* a_this)
 {
-	t_connection* p = static_cast<t_connection*>(a_this->f_pointer());
+	auto p = static_cast<t_connection*>(a_this->f_pointer());
 	assert(!*p);
 	delete p;
 }

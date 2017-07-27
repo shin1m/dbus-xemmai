@@ -12,6 +12,12 @@ void t_reply::f_destroy()
 	t_base::f_destroy();
 }
 
+void t_reply::f_dispose()
+{
+	dbus_pending_call_cancel(v_value);
+	t_base::f_dispose();
+}
+
 }
 
 }
@@ -34,7 +40,7 @@ t_type* t_type_of<t_reply>::f_derive(t_object* a_this)
 
 void t_type_of<t_reply>::f_finalize(t_object* a_this)
 {
-	t_reply* p = static_cast<t_reply*>(a_this->f_pointer());
+	auto p = static_cast<t_reply*>(a_this->f_pointer());
 	assert(!*p);
 	delete p;
 }
@@ -52,8 +58,13 @@ void t_type_of<t_reply>::f_instantiate(t_object* a_class, t_stacked* a_stack, si
 
 size_t t_type_of<t_reply>::f_call(t_object* a_this, t_stacked* a_stack, size_t a_n)
 {
-	if (a_n > 0) t_throwable::f_throw(a_stack, a_n, L"must be called without an argument.");
-	a_stack[0].f_construct(f_as<t_reply&>(a_this)());
+	if (a_n > 1) t_throwable::f_throw(a_stack, a_n, L"must be called with or without an argument.");
+	if (a_n > 0) {
+		f_as<t_reply&>(a_this)(std::move(a_stack[2]));
+		a_stack[0].f_construct();
+	} else {
+		a_stack[0].f_construct(f_as<t_reply&>(a_this)());
+	}
 	return -1;
 }
 

@@ -68,6 +68,9 @@ void t_message::f_get(t_array& a_array, DBusMessageIter& a_i)
 		case DBUS_TYPE_SIGNATURE:
 			a_array.f_push(f_global()->f_as(f_convert(value.str)));
 			break;
+		case DBUS_TYPE_UNIX_FD:
+			a_array.f_push(t_scoped(value.fd));
+			break;
 		}
 	}
 }
@@ -75,11 +78,37 @@ void t_message::f_get(t_array& a_array, DBusMessageIter& a_i)
 t_scoped t_message::f_get()
 {
 	t_scoped x = t_array::f_instantiate();
-	t_array& array = f_as<t_array&>(x);
+	auto& array = f_as<t_array&>(x);
 	DBusMessageIter i;
 	dbus_message_iter_init(v_value, &i);
 	f_get(array, i);
 	return x;
+}
+
+t_scoped t_message::f_append(int a_type, const char* a_signature, const t_value& a_callable)
+{
+	auto i = v_i;
+	DBusMessageIter j;
+	if (i) {
+		if (dbus_message_iter_open_container(i, a_type, a_signature, &j) == FALSE) t_throwable::f_throw(L"dbus_message_iter_open_container failed.");
+	} else {
+		dbus_message_iter_init_append(v_value, &j);
+	}
+	v_i = &j;
+	try {
+		if (i) {
+			a_callable(f_object());
+			if (dbus_message_iter_close_container(i, &j) == FALSE) t_throwable::f_throw(L"dbus_message_iter_close_container failed.");
+		} else {
+			f_append(a_type, a_signature, a_callable);
+		}
+		v_i = i;
+		return f_object();
+	} catch (...) {
+		if (i) dbus_message_iter_abandon_container(i, &j);
+		v_i = i;
+		throw;
+	}
 }
 
 }
@@ -102,7 +131,9 @@ void t_type_of<t_message>::f_define(t_extension* a_extension)
 			t_member<t_scoped (t_message::*)(intptr_t), &t_message::f_append>(),
 			t_member<t_scoped (t_message::*)(double), &t_message::f_append>(),
 			t_member<t_scoped (t_message::*)(int, const std::wstring&), &t_message::f_append>(),
-			t_member<t_scoped (t_message::*)(const std::wstring&), &t_message::f_append>()
+			t_member<t_scoped (t_message::*)(const std::wstring&), &t_message::f_append>(),
+			t_member<t_scoped (t_message::*)(int, const std::wstring&, const t_value&), &t_message::f_append>(),
+			t_member<t_scoped (t_message::*)(int, const t_value&), &t_message::f_append>()
 		)
 	;
 }
@@ -114,7 +145,7 @@ t_type* t_type_of<t_message>::f_derive(t_object* a_this)
 
 void t_type_of<t_message>::f_finalize(t_object* a_this)
 {
-	t_message* p = static_cast<t_message*>(a_this->f_pointer());
+	auto p = static_cast<t_message*>(a_this->f_pointer());
 	assert(!*p);
 	delete p;
 }
