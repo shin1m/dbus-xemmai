@@ -1,14 +1,14 @@
-#ifndef DBUS__XEMMAI__CONNECTION_H
-#define DBUS__XEMMAI__CONNECTION_H
+#ifndef XEMMAIX__DBUS__CONNECTION_H
+#define XEMMAIX__DBUS__CONNECTION_H
 
 #include <set>
 
 #include "reply.h"
 
-namespace dbus
+namespace xemmaix
 {
 
-namespace xemmai
+namespace dbus
 {
 
 class t_connection : public t_proxy_of<t_connection, DBusConnection>
@@ -179,13 +179,11 @@ public:
 namespace xemmai
 {
 
-using dbus::xemmai::t_connection;
-
 template<>
-struct t_type_of<t_connection> : t_type
+struct t_type_of<xemmaix::dbus::t_connection> : t_type
 {
 #include "cast.h"
-	typedef dbus::xemmai::t_extension t_extension;
+	typedef xemmaix::dbus::t_extension t_extension;
 
 	static void f_define(t_extension* a_extension);
 

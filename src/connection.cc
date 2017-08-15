@@ -2,10 +2,10 @@
 
 #include <cassert>
 
-namespace dbus
+namespace xemmaix
 {
 
-namespace xemmai
+namespace dbus
 {
 
 DBusHandlerResult t_connection::f_filter(DBusConnection* a_connection, DBusMessage* a_message, void* a_data)
@@ -74,43 +74,44 @@ void t_connection::f_remove_match(int a_type, const std::wstring& a_path, const 
 namespace xemmai
 {
 
-void t_type_of<t_connection>::f_define(t_extension* a_extension)
+void t_type_of<xemmaix::dbus::t_connection>::f_define(t_extension* a_extension)
 {
+	using namespace xemmaix::dbus;
 	t_define<t_connection, t_object>(a_extension, L"Connection")
-		(L"acquire", t_member<void (t_connection::*)(), &t_connection::f_acquire>())
-		(L"release", t_member<void (t_connection::*)(), &t_connection::f_release>())
-		(L"send", t_member<void (t_connection::*)(t_message&), &t_connection::f_send>())
-		(L"send_with_reply", t_member<t_scoped (t_connection::*)(t_message&), &t_connection::f_send_with_reply>())
-		(L"add_disconnected", t_member<void (t_connection::*)(t_scoped&&), &t_connection::f_add_disconnected>())
-		(L"remove_disconnected", t_member<void (t_connection::*)(const t_value&), &t_connection::f_remove_disconnected>())
-		(L"request_name", t_member<int (t_connection::*)(const std::wstring&, unsigned int), &t_connection::f_request_name>())
-		(L"release_name", t_member<int (t_connection::*)(const std::wstring&), &t_connection::f_release_name>())
-		(L"add_match", t_member<void (t_connection::*)(int, const std::wstring&, const std::wstring&, const std::wstring&, t_scoped&&), &t_connection::f_add_match>())
-		(L"remove_match", t_member<void (t_connection::*)(int, const std::wstring&, const std::wstring&, const std::wstring&), &t_connection::f_remove_match>())
+		(L"acquire", t_member<void(t_connection::*)(), &t_connection::f_acquire>())
+		(L"release", t_member<void(t_connection::*)(), &t_connection::f_release>())
+		(L"send", t_member<void(t_connection::*)(t_message&), &t_connection::f_send>())
+		(L"send_with_reply", t_member<t_scoped(t_connection::*)(t_message&), &t_connection::f_send_with_reply>())
+		(L"add_disconnected", t_member<void(t_connection::*)(t_scoped&&), &t_connection::f_add_disconnected>())
+		(L"remove_disconnected", t_member<void(t_connection::*)(const t_value&), &t_connection::f_remove_disconnected>())
+		(L"request_name", t_member<int(t_connection::*)(const std::wstring&, unsigned int), &t_connection::f_request_name>())
+		(L"release_name", t_member<int(t_connection::*)(const std::wstring&), &t_connection::f_release_name>())
+		(L"add_match", t_member<void(t_connection::*)(int, const std::wstring&, const std::wstring&, const std::wstring&, t_scoped&&), &t_connection::f_add_match>())
+		(L"remove_match", t_member<void(t_connection::*)(int, const std::wstring&, const std::wstring&, const std::wstring&), &t_connection::f_remove_match>())
 	;
 }
 
-t_type* t_type_of<t_connection>::f_derive(t_object* a_this)
+t_type* t_type_of<xemmaix::dbus::t_connection>::f_derive(t_object* a_this)
 {
 	return nullptr;
 }
 
-void t_type_of<t_connection>::f_finalize(t_object* a_this)
+void t_type_of<xemmaix::dbus::t_connection>::f_finalize(t_object* a_this)
 {
-	auto p = static_cast<t_connection*>(a_this->f_pointer());
+	auto p = static_cast<xemmaix::dbus::t_connection*>(a_this->f_pointer());
 	assert(!*p);
 	delete p;
 }
 
-t_scoped t_type_of<t_connection>::f_construct(t_object* a_class, t_stacked* a_stack, size_t a_n)
+t_scoped t_type_of<xemmaix::dbus::t_connection>::f_construct(t_object* a_class, t_stacked* a_stack, size_t a_n)
 {
 	return t_overload<
-		t_construct_with<t_scoped (*)(t_object*, DBusBusType), t_connection::f_construct>,
-		t_construct_with<t_scoped (*)(t_object*, const std::wstring&), t_connection::f_construct>
-	>::t_bind<t_connection>::f_do(a_class, a_stack, a_n);
+		t_construct_with<t_scoped(*)(t_object*, DBusBusType), xemmaix::dbus::t_connection::f_construct>,
+		t_construct_with<t_scoped(*)(t_object*, const std::wstring&), xemmaix::dbus::t_connection::f_construct>
+	>::t_bind<xemmaix::dbus::t_connection>::f_do(a_class, a_stack, a_n);
 }
 
-void t_type_of<t_connection>::f_instantiate(t_object* a_class, t_stacked* a_stack, size_t a_n)
+void t_type_of<xemmaix::dbus::t_connection>::f_instantiate(t_object* a_class, t_stacked* a_stack, size_t a_n)
 {
 	t_destruct_n destruct(a_stack, a_n);
 	a_stack[0].f_construct(f_construct(a_class, a_stack, a_n));

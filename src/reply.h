@@ -1,12 +1,12 @@
-#ifndef DBUS__XEMMAI__REPLY_H
-#define DBUS__XEMMAI__REPLY_H
+#ifndef XEMMAIX__DBUS__REPLY_H
+#define XEMMAIX__DBUS__REPLY_H
 
 #include "message.h"
 
-namespace dbus
+namespace xemmaix
 {
 
-namespace xemmai
+namespace dbus
 {
 
 class t_reply : public t_proxy_of<t_reply, DBusPendingCall>
@@ -90,13 +90,11 @@ public:
 namespace xemmai
 {
 
-using dbus::xemmai::t_reply;
-
 template<>
-struct t_type_of<t_reply> : t_type
+struct t_type_of<xemmaix::dbus::t_reply> : t_type
 {
 #include "cast.h"
-	typedef dbus::xemmai::t_extension t_extension;
+	typedef xemmaix::dbus::t_extension t_extension;
 
 	static void f_define(t_extension* a_extension);
 

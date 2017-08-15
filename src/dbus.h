@@ -1,12 +1,12 @@
-#ifndef DBUS__XEMMAI__DBUS_H
-#define DBUS__XEMMAI__DBUS_H
+#ifndef XEMMAIX__DBUS__DBUS_H
+#define XEMMAIX__DBUS__DBUS_H
 
 #ifdef _WIN32
-#ifndef DBUS__XEMMAI__EXPORT
-#define DBUS__XEMMAI__EXPORT __declspec(dllimport)
+#ifndef XEMMAIX__DBUS__EXPORT
+#define XEMMAIX__DBUS__EXPORT __declspec(dllimport)
 #endif
 #else
-#define DBUS__XEMMAI__EXPORT
+#define XEMMAIX__DBUS__EXPORT
 #endif
 
 #include <codecvt>
@@ -17,28 +17,13 @@
 #include <xemmai/bytes.h>
 #include <dbus/dbus.h>
 
+namespace xemmaix
+{
+
 namespace dbus
 {
 
-namespace xemmai
-{
-
-using ::xemmai::t_object;
-using ::xemmai::t_scan;
-using ::xemmai::t_value;
-using ::xemmai::t_slot;
-using ::xemmai::t_scoped;
-using ::xemmai::t_fundamental;
-using ::xemmai::t_type_of;
-using ::xemmai::f_check;
-using ::xemmai::f_as;
-using ::xemmai::t_define;
-using ::xemmai::f_global;
-using ::xemmai::t_tuple;
-using ::xemmai::t_throwable;
-using ::xemmai::t_array;
-using ::xemmai::t_bytes;
-using ::xemmai::t_safe_region;
+using namespace xemmai;
 
 class t_proxy;
 class t_extension;
@@ -63,7 +48,7 @@ protected:
 	t_entry(bool) : v_previous(this), v_next(this)
 	{
 	}
-	DBUS__XEMMAI__EXPORT t_entry();
+	XEMMAIX__DBUS__EXPORT t_entry();
 	void f_unlink()
 	{
 		v_previous->v_next = v_next;
@@ -72,7 +57,7 @@ protected:
 	}
 
 public:
-	DBUS__XEMMAI__EXPORT virtual void f_dispose();
+	XEMMAIX__DBUS__EXPORT virtual void f_dispose();
 };
 
 class t_session : public t_entry
@@ -88,7 +73,7 @@ class t_session : public t_entry
 
 public:
 #ifdef _WIN32
-	static DBUS__XEMMAI__EXPORT t_session* f_instance();
+	static XEMMAIX__DBUS__EXPORT t_session* f_instance();
 #else
 	static t_session* f_instance()
 	{
@@ -127,10 +112,10 @@ protected:
 	{
 		v_object.f_pointer__(this);
 	}
-	DBUS__XEMMAI__EXPORT virtual void f_destroy();
+	XEMMAIX__DBUS__EXPORT virtual void f_destroy();
 
 public:
-	DBUS__XEMMAI__EXPORT virtual ~t_proxy() = default;
+	XEMMAIX__DBUS__EXPORT virtual ~t_proxy() = default;
 	bool f_valid() const
 	{
 		return v_session == t_session::f_instance();
@@ -168,7 +153,7 @@ protected:
 	virtual void f_destroy();
 
 public:
-	static DBUS__XEMMAI__EXPORT dbus_int32_t v_slot;
+	static XEMMAIX__DBUS__EXPORT dbus_int32_t v_slot;
 
 	static T* f_from(T_value* a_value)
 	{
@@ -217,9 +202,9 @@ void t_proxy_of<T, T_value>::f_dispose()
 	}
 }
 
-class t_extension : public ::xemmai::t_extension
+class t_extension : public xemmai::t_extension
 {
-	template<typename T, typename T_super> friend class t_define;
+	template<typename T, typename T_super> friend class xemmai::t_define;
 
 	t_slot v_type_message;
 	t_slot v_type_reply;
@@ -312,7 +297,7 @@ namespace xemmai
 {
 
 template<>
-struct t_type_of<DBusBusType> : t_enum_of<DBusBusType, dbus::xemmai::t_extension>
+struct t_type_of<DBusBusType> : t_enum_of<DBusBusType, xemmaix::dbus::t_extension>
 {
 	static void f_define(t_extension* a_extension);
 

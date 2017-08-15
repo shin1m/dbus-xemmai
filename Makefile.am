@@ -1,1 +1,1 @@
-SUBDIRS = dbus/xemmai
+SUBDIRS = src

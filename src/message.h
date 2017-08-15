@@ -1,12 +1,12 @@
-#ifndef DBUS__XEMMAI__MESSAGE_H
-#define DBUS__XEMMAI__MESSAGE_H
+#ifndef XEMMAIX__DBUS__MESSAGE_H
+#define XEMMAIX__DBUS__MESSAGE_H
 
 #include "dbus.h"
 
-namespace dbus
+namespace xemmaix
 {
 
-namespace xemmai
+namespace dbus
 {
 
 class t_message : public t_proxy_of<t_message, DBusMessage>
@@ -168,13 +168,11 @@ public:
 namespace xemmai
 {
 
-using dbus::xemmai::t_message;
-
 template<>
-struct t_type_of<t_message> : t_type
+struct t_type_of<xemmaix::dbus::t_message> : t_type
 {
 #include "cast.h"
-	typedef dbus::xemmai::t_extension t_extension;
+	typedef xemmaix::dbus::t_extension t_extension;
 
 	static void f_define(t_extension* a_extension);
 

@@ -1,6 +1,15 @@
-xemmaidir = $(XEMMAI_MODULE_PATH)
+xemmaiincludedir = $(XEMMAI_INCLUDE_PATH)/xemmaix/dbus
 
-xemmai_LTLIBRARIES = dbus.la
+xemmaiinclude_HEADERS = \
+	cast.h \
+	message.h \
+	reply.h \
+	connection.h \
+	dbus.h
+
+xemmaimoduledir = $(XEMMAI_MODULE_PATH)
+
+xemmaimodule_LTLIBRARIES = dbus.la
 AM_CPPFLAGS = $(DBUS_CFLAGS) $(XEMMAI_CFLAGS)
 AM_CXXFLAGS =
 AM_LDFLAGS = -module -avoid-version
@@ -16,12 +25,7 @@ AM_LDFLAGS += -pg
 endif
 dbus_la_LIBADD = $(DBUS_LIBS) $(XEMMAI_LIBS)
 dbus_la_SOURCES = \
-	cast.h \
-	message.h \
 	message.cc \
-	reply.h \
 	reply.cc \
-	connection.h \
 	connection.cc \
-	dbus.h \
 	dbus.cc

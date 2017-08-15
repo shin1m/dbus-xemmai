@@ -1,12 +1,14 @@
-AC_INIT([dbus-xemmai], [201706])
+AC_INIT([dbus-xemmai], [201708])
 AM_INIT_AUTOMAKE([foreign nostdinc dist-bzip2 no-dist-gzip])
-AC_CONFIG_SRCDIR([dbus/xemmai/dbus.cc])
+AC_CONFIG_SRCDIR([src/dbus.cc])
 
 PKG_CHECK_MODULES([DBUS], [dbus-1 >= 1.8])
-XEMMAI_USE=xemmai-201706
+XEMMAI_USE=xemmai-201708
 PKG_CHECK_MODULES([XEMMAI], [${XEMMAI_USE}], [
+	XEMMAI_INCLUDE_PATH=`pkg-config --variable=include_path ${XEMMAI_USE}`
 	XEMMAI_MODULE_PATH=`pkg-config --variable=module_path ${XEMMAI_USE}`
 ])
+AC_SUBST(XEMMAI_INCLUDE_PATH)
 AC_SUBST(XEMMAI_MODULE_PATH)
 
 if test "${CXXFLAGS+set}" != set; then
@@ -43,9 +45,9 @@ AC_ARG_ENABLE(
 )
 AM_CONDITIONAL([PROFILE], [test x$profile = xtrue])
 
-AC_CONFIG_HEADERS([dbus/xemmai/configure.h])
+AC_CONFIG_HEADERS([src/configure.h])
 AC_CONFIG_FILES([
 	Makefile
-	dbus/xemmai/Makefile
+	src/Makefile
 ])
 AC_OUTPUT
