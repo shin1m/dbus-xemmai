@@ -1,9 +1,6 @@
 #include "connection.h"
 
-namespace xemmaix
-{
-
-namespace dbus
+namespace xemmaix::dbus
 {
 
 std::string f_convert(const std::wstring& a_string)
@@ -61,10 +58,8 @@ t_scoped f_tuple(t_scoped&& a_0, t_scoped&& a_1, t_scoped&& a_2, t_scoped&& a_3,
 	return p;
 }
 
-t_entry::t_entry()
+t_entry::t_entry() : v_previous(t_session::f_instance()), v_next(v_previous->v_next)
 {
-	v_previous = t_session::f_instance();
-	v_next = v_previous->v_next;
 	v_previous->v_next = v_next->v_previous = this;
 }
 
@@ -199,8 +194,6 @@ void t_extension::f_scan(t_scan a_scan)
 	a_scan(v_type_reply);
 	a_scan(v_type_bus_type);
 	a_scan(v_type_connection);
-}
-
 }
 
 }

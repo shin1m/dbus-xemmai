@@ -5,10 +5,7 @@
 
 #include "reply.h"
 
-namespace xemmaix
-{
-
-namespace dbus
+namespace xemmaix::dbus
 {
 
 class t_connection : public t_proxy_of<t_connection, DBusConnection>
@@ -171,8 +168,6 @@ public:
 		return v_i;
 	}
 };
-
-}
 
 }
 

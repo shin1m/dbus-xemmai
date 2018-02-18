@@ -17,10 +17,7 @@
 #include <xemmai/bytes.h>
 #include <dbus/dbus.h>
 
-namespace xemmaix
-{
-
-namespace dbus
+namespace xemmaix::dbus
 {
 
 using namespace xemmai;
@@ -287,8 +284,6 @@ template<>
 inline t_object* t_extension::f_type<t_connection>() const
 {
 	return v_type_connection;
-}
-
 }
 
 }

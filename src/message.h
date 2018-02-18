@@ -3,10 +3,7 @@
 
 #include "dbus.h"
 
-namespace xemmaix
-{
-
-namespace dbus
+namespace xemmaix::dbus
 {
 
 class t_message : public t_proxy_of<t_message, DBusMessage>
@@ -160,8 +157,6 @@ public:
 		}
 	}
 };
-
-}
 
 }
 

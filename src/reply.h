@@ -3,10 +3,7 @@
 
 #include "message.h"
 
-namespace xemmaix
-{
-
-namespace dbus
+namespace xemmaix::dbus
 {
 
 class t_reply : public t_proxy_of<t_reply, DBusPendingCall>
@@ -82,8 +79,6 @@ public:
 		}) == FALSE) t_throwable::f_throw(L"dbus_pending_call_set_notify failed.");
 	}
 };
-
-}
 
 }
 

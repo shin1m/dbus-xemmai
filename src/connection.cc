@@ -2,10 +2,7 @@
 
 #include <cassert>
 
-namespace xemmaix
-{
-
-namespace dbus
+namespace xemmaix::dbus
 {
 
 DBusHandlerResult t_connection::f_filter(DBusConnection* a_connection, DBusMessage* a_message, void* a_data)
@@ -65,8 +62,6 @@ void t_connection::f_remove_match(int a_type, const std::wstring& a_path, const 
 		dbus_error_free(&error);
 		t_throwable::f_throw(s);
 	}
-}
-
 }
 
 }

@@ -1,9 +1,6 @@
 #include "reply.h"
 
-namespace xemmaix
-{
-
-namespace dbus
+namespace xemmaix::dbus
 {
 
 void t_reply::f_destroy()
@@ -16,8 +13,6 @@ void t_reply::f_dispose()
 {
 	dbus_pending_call_cancel(v_value);
 	t_base::f_dispose();
-}
-
 }
 
 }

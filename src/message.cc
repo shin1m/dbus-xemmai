@@ -1,9 +1,6 @@
 #include "message.h"
 
-namespace xemmaix
-{
-
-namespace dbus
+namespace xemmaix::dbus
 {
 
 void t_message::f_get(t_array& a_array, DBusMessageIter& a_i)
@@ -109,8 +106,6 @@ t_scoped t_message::f_append(int a_type, const char* a_signature, const t_value&
 		v_i = i;
 		throw;
 	}
-}
-
 }
 
 }
