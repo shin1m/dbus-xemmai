@@ -42,25 +42,25 @@ public:
 		return p ? p : new t_message(a_value);
 	}
 	using t_base::f_construct;
-	static t_scoped f_construct(t_object* a_class, const std::wstring* a_destination, const std::wstring& a_path, const std::wstring* a_interface, const std::wstring& a_method)
+	static t_scoped f_construct(t_type* a_class, const std::wstring* a_destination, const std::wstring& a_path, const std::wstring* a_interface, const std::wstring& a_method)
 	{
 		DBusMessage* p = dbus_message_new_method_call(a_destination ? f_convert(*a_destination).c_str() : NULL, f_convert(a_path).c_str(), a_interface ? f_convert(*a_interface).c_str() : NULL, f_convert(a_method).c_str());
 		if (p == NULL) t_throwable::f_throw(L"dbus_message_new_method_call failed.");
 		return f_construct(p);
 	}
-	static t_scoped f_construct(t_object* a_class, t_message& a_call)
+	static t_scoped f_construct(t_type* a_class, t_message& a_call)
 	{
 		DBusMessage* p = dbus_message_new_method_return(a_call);
 		if (p == NULL) t_throwable::f_throw(L"dbus_message_new_method_return failed.");
 		return f_construct(p);
 	}
-	static t_scoped f_construct(t_object* a_class, const std::wstring& a_path, const std::wstring& a_interface, const std::wstring& a_name)
+	static t_scoped f_construct(t_type* a_class, const std::wstring& a_path, const std::wstring& a_interface, const std::wstring& a_name)
 	{
 		DBusMessage* p = dbus_message_new_signal(f_convert(a_path).c_str(), f_convert(a_interface).c_str(), f_convert(a_name).c_str());
 		if (p == NULL) t_throwable::f_throw(L"dbus_message_new_signal failed.");
 		return f_construct(p);
 	}
-	static t_scoped f_construct(t_object* a_class, t_message& a_to, const std::wstring& a_name, const std::wstring* a_message)
+	static t_scoped f_construct(t_type* a_class, t_message& a_to, const std::wstring& a_name, const std::wstring* a_message)
 	{
 		DBusMessage* p = dbus_message_new_error(a_to, f_convert(a_name).c_str(), a_message ? f_convert(*a_message).c_str() : NULL);
 		if (p == NULL) t_throwable::f_throw(L"dbus_message_new_error failed.");
@@ -172,10 +172,10 @@ struct t_type_of<xemmaix::dbus::t_message> : t_type
 	static void f_define(t_extension* a_extension);
 
 	using t_type::t_type;
-	virtual t_type* f_derive(t_object* a_this);
+	virtual t_type* f_derive();
 	virtual void f_finalize(t_object* a_this);
-	virtual t_scoped f_construct(t_object* a_class, t_stacked* a_stack, size_t a_n);
-	virtual void f_instantiate(t_object* a_class, t_stacked* a_stack, size_t a_n);
+	virtual t_scoped f_construct(t_stacked* a_stack, size_t a_n);
+	virtual void f_instantiate(t_stacked* a_stack, size_t a_n);
 };
 
 }

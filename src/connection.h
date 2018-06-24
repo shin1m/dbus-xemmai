@@ -69,7 +69,7 @@ public:
 		t_connection* p = f_from(a_value);
 		return p ? p : new t_connection(a_value);
 	}
-	static t_scoped f_construct(t_object* a_class, DBusBusType a_type)
+	static t_scoped f_construct(t_type* a_class, DBusBusType a_type)
 	{
 		DBusError error;
 		dbus_error_init(&error);
@@ -82,7 +82,7 @@ public:
 		dbus_connection_set_exit_on_disconnect(p, FALSE);
 		return f_construct_shared<t_connection>(p);
 	}
-	static t_scoped f_construct(t_object* a_class, const std::wstring& a_address)
+	static t_scoped f_construct(t_type* a_class, const std::wstring& a_address)
 	{
 		DBusError error;
 		dbus_error_init(&error);
@@ -183,10 +183,10 @@ struct t_type_of<xemmaix::dbus::t_connection> : t_type
 	static void f_define(t_extension* a_extension);
 
 	using t_type::t_type;
-	virtual t_type* f_derive(t_object* a_this);
+	virtual t_type* f_derive();
 	virtual void f_finalize(t_object* a_this);
-	virtual t_scoped f_construct(t_object* a_class, t_stacked* a_stack, size_t a_n);
-	virtual void f_instantiate(t_object* a_class, t_stacked* a_stack, size_t a_n);
+	virtual t_scoped f_construct(t_stacked* a_stack, size_t a_n);
+	virtual void f_instantiate(t_stacked* a_stack, size_t a_n);
 };
 
 }

@@ -100,7 +100,7 @@ protected:
 
 	size_t v_n = 0;
 
-	t_proxy(t_object* a_class) : v_session(t_session::f_instance()), v_object(t_object::f_allocate(a_class))
+	t_proxy(t_type* a_class) : v_session(t_session::f_instance()), v_object(t_object::f_allocate(a_class))
 	{
 		v_object.f_pointer__(this);
 	}
@@ -138,7 +138,7 @@ protected:
 
 	T_value* v_value;
 
-	t_proxy_of(t_object* a_class, T_value* a_value) : t_proxy(a_class), v_value(a_value)
+	t_proxy_of(t_type* a_class, T_value* a_value) : t_proxy(a_class), v_value(a_value)
 	{
 		T::f_set_data(v_value, v_slot, this, t_proxy::f_destroy);
 	}
@@ -196,15 +196,10 @@ void t_proxy_of<T, T_value>::f_dispose()
 
 class t_extension : public xemmai::t_extension
 {
-	template<typename T, typename T_super> friend class xemmai::t_define;
-
-	t_slot v_type_message;
-	t_slot v_type_reply;
-	t_slot v_type_bus_type;
-	t_slot v_type_connection;
-
-	template<typename T>
-	void f_type__(t_scoped&& a_type);
+	t_slot_of<t_type> v_type_message;
+	t_slot_of<t_type> v_type_reply;
+	t_slot_of<t_type> v_type_bus_type;
+	t_slot_of<t_type> v_type_connection;
 
 public:
 	t_extension(t_object* a_module);
@@ -215,9 +210,14 @@ public:
 		return f_global();
 	}
 	template<typename T>
-	t_object* f_type() const
+	t_slot_of<t_type>& f_type_slot()
 	{
-		return f_global()->f_type<T>();
+		return f_global()->f_type_slot<T>();
+	}
+	template<typename T>
+	t_type* f_type() const
+	{
+		return const_cast<t_extension*>(this)->f_type_slot<T>();
 	}
 	template<typename T>
 	t_scoped f_as(T&& a_value) const
@@ -228,55 +228,31 @@ public:
 };
 
 template<>
-inline void t_extension::f_type__<t_message>(t_scoped&& a_type)
-{
-	v_type_message = std::move(a_type);
-}
-
-template<>
-inline void t_extension::f_type__<t_reply>(t_scoped&& a_type)
-{
-	v_type_reply = std::move(a_type);
-}
-
-template<>
-inline void t_extension::f_type__<DBusBusType>(t_scoped&& a_type)
-{
-	v_type_bus_type = std::move(a_type);
-}
-
-template<>
-inline void t_extension::f_type__<t_connection>(t_scoped&& a_type)
-{
-	v_type_connection = std::move(a_type);
-}
-
-template<>
 inline const t_extension* t_extension::f_extension<t_extension>() const
 {
 	return this;
 }
 
 template<>
-inline t_object* t_extension::f_type<t_message>() const
+inline t_slot_of<t_type>& t_extension::f_type_slot<t_message>()
 {
 	return v_type_message;
 }
 
 template<>
-inline t_object* t_extension::f_type<t_reply>() const
+inline t_slot_of<t_type>& t_extension::f_type_slot<t_reply>()
 {
 	return v_type_reply;
 }
 
 template<>
-inline t_object* t_extension::f_type<DBusBusType>() const
+inline t_slot_of<t_type>& t_extension::f_type_slot<DBusBusType>()
 {
 	return v_type_bus_type;
 }
 
 template<>
-inline t_object* t_extension::f_type<t_connection>() const
+inline t_slot_of<t_type>& t_extension::f_type_slot<t_connection>()
 {
 	return v_type_connection;
 }
