@@ -86,18 +86,11 @@ namespace xemmai
 {
 
 template<>
-struct t_type_of<xemmaix::dbus::t_reply> : t_type
+struct t_type_of<xemmaix::dbus::t_reply> : t_uninstantiatable<xemmaix::dbus::t_holds<xemmaix::dbus::t_reply>>
 {
-#include "cast.h"
-	typedef xemmaix::dbus::t_extension t_extension;
-
 	static void f_define(t_extension* a_extension);
 
-	using t_type::t_type;
-	virtual t_type* f_derive();
-	virtual void f_finalize(t_object* a_this);
-	virtual t_scoped f_construct(t_stacked* a_stack, size_t a_n);
-	virtual void f_instantiate(t_stacked* a_stack, size_t a_n);
+	using t_base::t_base;
 	virtual size_t f_call(t_object* a_this, t_stacked* a_stack, size_t a_n);
 };
 

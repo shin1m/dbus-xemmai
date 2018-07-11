@@ -1,7 +1,6 @@
 xemmaiincludedir = $(XEMMAI_INCLUDE_PATH)/xemmaix/dbus
 
 xemmaiinclude_HEADERS = \
-	cast.h \
 	message.h \
 	reply.h \
 	connection.h \

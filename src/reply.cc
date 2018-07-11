@@ -29,29 +29,6 @@ void t_type_of<xemmaix::dbus::t_reply>::f_define(t_extension* a_extension)
 	;
 }
 
-t_type* t_type_of<xemmaix::dbus::t_reply>::f_derive()
-{
-	return nullptr;
-}
-
-void t_type_of<xemmaix::dbus::t_reply>::f_finalize(t_object* a_this)
-{
-	auto p = static_cast<xemmaix::dbus::t_reply*>(a_this->f_pointer());
-	assert(!*p);
-	delete p;
-}
-
-t_scoped t_type_of<xemmaix::dbus::t_reply>::f_construct(t_stacked* a_stack, size_t a_n)
-{
-	t_throwable::f_throw(L"uninstantiatable.");
-}
-
-void t_type_of<xemmaix::dbus::t_reply>::f_instantiate(t_stacked* a_stack, size_t a_n)
-{
-	t_destruct_n destruct(a_stack, a_n);
-	a_stack[0].f_construct(f_construct(a_stack, a_n));
-}
-
 size_t t_type_of<xemmaix::dbus::t_reply>::f_call(t_object* a_this, t_stacked* a_stack, size_t a_n)
 {
 	if (a_n > 1) t_throwable::f_throw(a_stack, a_n, L"must be called with or without an argument.");
