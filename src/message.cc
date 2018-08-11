@@ -87,7 +87,7 @@ t_scoped t_message::f_append(int a_type, const char* a_signature, const t_value&
 	auto i = v_i;
 	DBusMessageIter j;
 	if (i) {
-		if (dbus_message_iter_open_container(i, a_type, a_signature, &j) == FALSE) t_throwable::f_throw(L"dbus_message_iter_open_container failed.");
+		if (dbus_message_iter_open_container(i, a_type, a_signature, &j) == FALSE) f_throw(L"dbus_message_iter_open_container failed.");
 	} else {
 		dbus_message_iter_init_append(v_value, &j);
 	}
@@ -95,7 +95,7 @@ t_scoped t_message::f_append(int a_type, const char* a_signature, const t_value&
 	try {
 		if (i) {
 			a_callable(f_object());
-			if (dbus_message_iter_close_container(i, &j) == FALSE) t_throwable::f_throw(L"dbus_message_iter_close_container failed.");
+			if (dbus_message_iter_close_container(i, &j) == FALSE) f_throw(L"dbus_message_iter_close_container failed.");
 		} else {
 			f_append(a_type, a_signature, a_callable);
 		}
@@ -134,7 +134,7 @@ void t_type_of<xemmaix::dbus::t_message>::f_define(t_extension* a_extension)
 	;
 }
 
-t_scoped t_type_of<xemmaix::dbus::t_message>::f_construct(t_stacked* a_stack, size_t a_n)
+t_scoped t_type_of<xemmaix::dbus::t_message>::f_do_construct(t_stacked* a_stack, size_t a_n)
 {
 	return t_overload<
 		t_construct_with<t_scoped(*)(t_type*, const std::wstring*, const std::wstring&, const std::wstring*, const std::wstring&), xemmaix::dbus::t_message::f_construct>,

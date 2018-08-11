@@ -58,7 +58,7 @@ class t_connection : public t_proxy_of<t_connection, DBusConnection>
 
 	t_connection(DBusConnection* a_value) : t_base(t_session::f_instance()->f_extension()->f_type<t_connection>(), a_value)
 	{
-		if (dbus_connection_add_filter(v_value, f_filter, this, NULL) == FALSE) t_throwable::f_throw(L"dbus_connection_add_filter failed.");
+		if (dbus_connection_add_filter(v_value, f_filter, this, NULL) == FALSE) f_throw(L"dbus_connection_add_filter failed.");
 	}
 	virtual void f_destroy();
 
@@ -77,7 +77,7 @@ public:
 		if (p == NULL) {
 			std::wstring s = L"dbus_bus_get_private failed: " + f_convert(error.name) + L", " + f_convert(error.message);
 			dbus_error_free(&error);
-			t_throwable::f_throw(s);
+			f_throw(s);
 		}
 		dbus_connection_set_exit_on_disconnect(p, FALSE);
 		return f_construct_shared<t_connection>(p);
@@ -90,7 +90,7 @@ public:
 		if (p == NULL) {
 			std::wstring s = L"dbus_connection_open_private failed: " + f_convert(error.name) + L", " + f_convert(error.message);
 			dbus_error_free(&error);
-			t_throwable::f_throw(s);
+			f_throw(s);
 		}
 		return f_construct_shared<t_connection>(p);
 	}
@@ -105,12 +105,12 @@ public:
 	}
 	void f_send(t_message& a_message)
 	{
-		if (dbus_connection_send(v_value, a_message, NULL) == FALSE) t_throwable::f_throw(L"dbus_connection_send failed.");
+		if (dbus_connection_send(v_value, a_message, NULL) == FALSE) f_throw(L"dbus_connection_send failed.");
 	}
 	t_scoped f_send_with_reply(t_message& a_message)
 	{
 		DBusPendingCall* p;
-		if (dbus_connection_send_with_reply(v_value, a_message, &p, DBUS_TIMEOUT_USE_DEFAULT) == FALSE) t_throwable::f_throw(L"dbus_connection_send_with_reply failed.");
+		if (dbus_connection_send_with_reply(v_value, a_message, &p, DBUS_TIMEOUT_USE_DEFAULT) == FALSE) f_throw(L"dbus_connection_send_with_reply failed.");
 		return t_reply::f_construct(p, v_value);
 	}
 	void f_add_disconnected(t_scoped&& a_callable)
@@ -129,7 +129,7 @@ public:
 		if (result == -1) {
 			std::wstring s = L"dbus_bus_request_name failed: " + f_convert(error.name) + L", " + f_convert(error.message);
 			dbus_error_free(&error);
-			t_throwable::f_throw(s);
+			f_throw(s);
 		}
 		return result;
 	}
@@ -141,7 +141,7 @@ public:
 		if (result == -1) {
 			std::wstring s = L"dbus_bus_release_name failed: " + f_convert(error.name) + L", " + f_convert(error.message);
 			dbus_error_free(&error);
-			t_throwable::f_throw(s);
+			f_throw(s);
 		}
 		return result;
 	}
@@ -180,7 +180,7 @@ struct t_type_of<xemmaix::dbus::t_connection> : xemmaix::dbus::t_holds<xemmaix::
 	static void f_define(t_extension* a_extension);
 
 	using t_base::t_base;
-	virtual t_scoped f_construct(t_stacked* a_stack, size_t a_n);
+	t_scoped f_do_construct(t_stacked* a_stack, size_t a_n);
 };
 
 }

@@ -43,7 +43,7 @@ void t_connection::f_add_match(int a_type, const std::wstring& a_path, const std
 	if (dbus_error_is_set(&error) != FALSE) {
 		std::wstring s = L"dbus_bus_add_match failed: " + f_convert(error.name) + L", " + f_convert(error.message);
 		dbus_error_free(&error);
-		t_throwable::f_throw(s);
+		f_throw(s);
 	}
 }
 
@@ -60,7 +60,7 @@ void t_connection::f_remove_match(int a_type, const std::wstring& a_path, const 
 	if (dbus_error_is_set(&error) != FALSE) {
 		std::wstring s = L"dbus_bus_remove_match failed: " + f_convert(error.name) + L", " + f_convert(error.message);
 		dbus_error_free(&error);
-		t_throwable::f_throw(s);
+		f_throw(s);
 	}
 }
 
@@ -86,7 +86,7 @@ void t_type_of<xemmaix::dbus::t_connection>::f_define(t_extension* a_extension)
 	;
 }
 
-t_scoped t_type_of<xemmaix::dbus::t_connection>::f_construct(t_stacked* a_stack, size_t a_n)
+t_scoped t_type_of<xemmaix::dbus::t_connection>::f_do_construct(t_stacked* a_stack, size_t a_n)
 {
 	return t_overload<
 		t_construct_with<t_scoped(*)(t_type*, DBusBusType), xemmaix::dbus::t_connection::f_construct>,

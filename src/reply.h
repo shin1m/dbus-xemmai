@@ -29,7 +29,7 @@ class t_reply : public t_proxy_of<t_reply, DBusPendingCall>
 	static t_scoped f_steal(DBusPendingCall* a_value)
 	{
 		auto message = dbus_pending_call_steal_reply(a_value);
-		if (message == NULL) t_throwable::f_throw(L"dbus_pending_call_steal_reply failed.");
+		if (message == NULL) f_throw(L"dbus_pending_call_steal_reply failed.");
 		return t_message::f_construct(message);
 	}
 
@@ -76,7 +76,7 @@ public:
 		}, new t_scoped(std::move(a_callable)), [](auto a_data)
 		{
 			delete static_cast<t_scoped*>(a_data);
-		}) == FALSE) t_throwable::f_throw(L"dbus_pending_call_set_notify failed.");
+		}) == FALSE) f_throw(L"dbus_pending_call_set_notify failed.");
 	}
 };
 
@@ -91,7 +91,7 @@ struct t_type_of<xemmaix::dbus::t_reply> : t_uninstantiatable<xemmaix::dbus::t_h
 	static void f_define(t_extension* a_extension);
 
 	using t_base::t_base;
-	virtual size_t f_call(t_object* a_this, t_stacked* a_stack, size_t a_n);
+	static size_t f_do_call(t_object* a_this, t_stacked* a_stack, size_t a_n);
 };
 
 }

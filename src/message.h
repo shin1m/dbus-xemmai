@@ -45,25 +45,25 @@ public:
 	static t_scoped f_construct(t_type* a_class, const std::wstring* a_destination, const std::wstring& a_path, const std::wstring* a_interface, const std::wstring& a_method)
 	{
 		DBusMessage* p = dbus_message_new_method_call(a_destination ? f_convert(*a_destination).c_str() : NULL, f_convert(a_path).c_str(), a_interface ? f_convert(*a_interface).c_str() : NULL, f_convert(a_method).c_str());
-		if (p == NULL) t_throwable::f_throw(L"dbus_message_new_method_call failed.");
+		if (p == NULL) f_throw(L"dbus_message_new_method_call failed.");
 		return f_construct(p);
 	}
 	static t_scoped f_construct(t_type* a_class, t_message& a_call)
 	{
 		DBusMessage* p = dbus_message_new_method_return(a_call);
-		if (p == NULL) t_throwable::f_throw(L"dbus_message_new_method_return failed.");
+		if (p == NULL) f_throw(L"dbus_message_new_method_return failed.");
 		return f_construct(p);
 	}
 	static t_scoped f_construct(t_type* a_class, const std::wstring& a_path, const std::wstring& a_interface, const std::wstring& a_name)
 	{
 		DBusMessage* p = dbus_message_new_signal(f_convert(a_path).c_str(), f_convert(a_interface).c_str(), f_convert(a_name).c_str());
-		if (p == NULL) t_throwable::f_throw(L"dbus_message_new_signal failed.");
+		if (p == NULL) f_throw(L"dbus_message_new_signal failed.");
 		return f_construct(p);
 	}
 	static t_scoped f_construct(t_type* a_class, t_message& a_to, const std::wstring& a_name, const std::wstring* a_message)
 	{
 		DBusMessage* p = dbus_message_new_error(a_to, f_convert(a_name).c_str(), a_message ? f_convert(*a_message).c_str() : NULL);
-		if (p == NULL) t_throwable::f_throw(L"dbus_message_new_error failed.");
+		if (p == NULL) f_throw(L"dbus_message_new_error failed.");
 		return f_construct(p);
 	}
 
@@ -83,9 +83,9 @@ public:
 	t_scoped f_append(int a_type, const void* a_value)
 	{
 		if (v_i) {
-			if (dbus_message_iter_append_basic(v_i, a_type, a_value) != TRUE) t_throwable::f_throw(L"dbus_message_iter_append_basic failed.");
+			if (dbus_message_iter_append_basic(v_i, a_type, a_value) != TRUE) f_throw(L"dbus_message_iter_append_basic failed.");
 		} else {
-			if (dbus_message_append_args(v_value, a_type, a_value, DBUS_TYPE_INVALID) != TRUE) t_throwable::f_throw(L"dbus_message_append_args failed.");
+			if (dbus_message_append_args(v_value, a_type, a_value, DBUS_TYPE_INVALID) != TRUE) f_throw(L"dbus_message_append_args failed.");
 		}
 		return f_object();
 	}
@@ -106,7 +106,7 @@ public:
 		case DBUS_TYPE_UINT64:
 			return f_append(a_type, &a_value);
 		default:
-			t_throwable::f_throw(L"invalid type.");
+			f_throw(L"invalid type.");
 		}
 	}
 	t_scoped f_append(intptr_t a_value)
@@ -125,7 +125,7 @@ public:
 		case DBUS_TYPE_SIGNATURE:
 			break;
 		default:
-			t_throwable::f_throw(L"invalid type.");
+			f_throw(L"invalid type.");
 		}
 		std::string value = f_convert(a_value);
 		const char* p = value.c_str();
@@ -143,7 +143,7 @@ public:
 		case DBUS_TYPE_VARIANT:
 			return f_append(a_type, f_convert(a_signature).c_str(), a_callable);
 		default:
-			t_throwable::f_throw(L"invalid type.");
+			f_throw(L"invalid type.");
 		}
 	}
 	t_scoped f_append(int a_type, const t_value& a_callable)
@@ -153,7 +153,7 @@ public:
 		case DBUS_TYPE_DICT_ENTRY:
 			return f_append(a_type, NULL, a_callable);
 		default:
-			t_throwable::f_throw(L"invalid type.");
+			f_throw(L"invalid type.");
 		}
 	}
 };
@@ -169,7 +169,7 @@ struct t_type_of<xemmaix::dbus::t_message> : xemmaix::dbus::t_holds<xemmaix::dbu
 	static void f_define(t_extension* a_extension);
 
 	using t_base::t_base;
-	virtual t_scoped f_construct(t_stacked* a_stack, size_t a_n);
+	t_scoped f_do_construct(t_stacked* a_stack, size_t a_n);
 };
 
 }
