@@ -30,7 +30,7 @@ void t_connection::f_destroy()
 	t_base::f_destroy();
 }
 
-void t_connection::f_add_match(int a_type, const std::wstring& a_path, const std::wstring& a_interface, const std::wstring& a_member, t_scoped&& a_callable)
+void t_connection::f_add_match(int a_type, std::wstring_view a_path, std::wstring_view a_interface, std::wstring_view a_member, t_scoped&& a_callable)
 {
 	std::string path = f_convert(a_path);
 	std::string interface = f_convert(a_interface);
@@ -39,7 +39,7 @@ void t_connection::f_add_match(int a_type, const std::wstring& a_path, const std
 	std::string type = dbus_message_type_to_string(a_type);
 	DBusError error;
 	dbus_error_init(&error);
-	dbus_bus_add_match(v_value, ("type='" + type + "',path='" + path + "',interface='" + interface + "',member='" + member + "'").c_str(), &error);
+	dbus_bus_add_match(v_value, ("type='" + type + "',path='" + path + "',interface='" + interface + "',member='" + member + '\'').c_str(), &error);
 	if (dbus_error_is_set(&error) != FALSE) {
 		std::wstring s = L"dbus_bus_add_match failed: " + f_convert(error.name) + L", " + f_convert(error.message);
 		dbus_error_free(&error);
@@ -47,7 +47,7 @@ void t_connection::f_add_match(int a_type, const std::wstring& a_path, const std
 	}
 }
 
-void t_connection::f_remove_match(int a_type, const std::wstring& a_path, const std::wstring& a_interface, const std::wstring& a_member)
+void t_connection::f_remove_match(int a_type, std::wstring_view a_path, std::wstring_view a_interface, std::wstring_view a_member)
 {
 	std::string path = f_convert(a_path);
 	std::string interface = f_convert(a_interface);
@@ -56,7 +56,7 @@ void t_connection::f_remove_match(int a_type, const std::wstring& a_path, const 
 	std::string type = dbus_message_type_to_string(a_type);
 	DBusError error;
 	dbus_error_init(&error);
-	dbus_bus_remove_match(v_value, ("type='" + type + "',path='" + path + "',interface='" + interface + "',member='" + member + "'").c_str(), &error);
+	dbus_bus_remove_match(v_value, ("type='" + type + "',path='" + path + "',interface='" + interface + "',member='" + member + '\'').c_str(), &error);
 	if (dbus_error_is_set(&error) != FALSE) {
 		std::wstring s = L"dbus_bus_remove_match failed: " + f_convert(error.name) + L", " + f_convert(error.message);
 		dbus_error_free(&error);
@@ -72,17 +72,17 @@ namespace xemmai
 void t_type_of<xemmaix::dbus::t_connection>::f_define(t_extension* a_extension)
 {
 	using namespace xemmaix::dbus;
-	t_define<t_connection, t_object>(a_extension, L"Connection")
-		(L"acquire", t_member<void(t_connection::*)(), &t_connection::f_acquire>())
-		(L"release", t_member<void(t_connection::*)(), &t_connection::f_release>())
-		(L"send", t_member<void(t_connection::*)(t_message&), &t_connection::f_send>())
-		(L"send_with_reply", t_member<t_scoped(t_connection::*)(t_message&), &t_connection::f_send_with_reply>())
-		(L"add_disconnected", t_member<void(t_connection::*)(t_scoped&&), &t_connection::f_add_disconnected>())
-		(L"remove_disconnected", t_member<void(t_connection::*)(const t_value&), &t_connection::f_remove_disconnected>())
-		(L"request_name", t_member<int(t_connection::*)(const std::wstring&, unsigned int), &t_connection::f_request_name>())
-		(L"release_name", t_member<int(t_connection::*)(const std::wstring&), &t_connection::f_release_name>())
-		(L"add_match", t_member<void(t_connection::*)(int, const std::wstring&, const std::wstring&, const std::wstring&, t_scoped&&), &t_connection::f_add_match>())
-		(L"remove_match", t_member<void(t_connection::*)(int, const std::wstring&, const std::wstring&, const std::wstring&), &t_connection::f_remove_match>())
+	t_define<t_connection, t_object>(a_extension, L"Connection"sv)
+		(L"acquire"sv, t_member<void(t_connection::*)(), &t_connection::f_acquire>())
+		(L"release"sv, t_member<void(t_connection::*)(), &t_connection::f_release>())
+		(L"send"sv, t_member<void(t_connection::*)(t_message&), &t_connection::f_send>())
+		(L"send_with_reply"sv, t_member<t_scoped(t_connection::*)(t_message&), &t_connection::f_send_with_reply>())
+		(L"add_disconnected"sv, t_member<void(t_connection::*)(t_scoped&&), &t_connection::f_add_disconnected>())
+		(L"remove_disconnected"sv, t_member<void(t_connection::*)(const t_value&), &t_connection::f_remove_disconnected>())
+		(L"request_name"sv, t_member<int(t_connection::*)(std::wstring_view, unsigned int), &t_connection::f_request_name>())
+		(L"release_name"sv, t_member<int(t_connection::*)(std::wstring_view), &t_connection::f_release_name>())
+		(L"add_match"sv, t_member<void(t_connection::*)(int, std::wstring_view, std::wstring_view, std::wstring_view, t_scoped&&), &t_connection::f_add_match>())
+		(L"remove_match"sv, t_member<void(t_connection::*)(int, std::wstring_view, std::wstring_view, std::wstring_view), &t_connection::f_remove_match>())
 	;
 }
 
@@ -90,7 +90,7 @@ t_scoped t_type_of<xemmaix::dbus::t_connection>::f_do_construct(t_stacked* a_sta
 {
 	return t_overload<
 		t_construct_with<t_scoped(*)(t_type*, DBusBusType), xemmaix::dbus::t_connection::f_construct>,
-		t_construct_with<t_scoped(*)(t_type*, const std::wstring&), xemmaix::dbus::t_connection::f_construct>
+		t_construct_with<t_scoped(*)(t_type*, std::wstring_view), xemmaix::dbus::t_connection::f_construct>
 	>::t_bind<xemmaix::dbus::t_connection>::f_do(this, a_stack, a_n);
 }
 

@@ -10,7 +10,7 @@ xemmaimoduledir = $(XEMMAI_MODULE_PATH)
 
 xemmaimodule_LTLIBRARIES = dbus.la
 AM_CPPFLAGS = $(DBUS_CFLAGS) $(XEMMAI_CFLAGS)
-AM_CXXFLAGS =
+AM_CXXFLAGS = -std=c++17
 AM_LDFLAGS = -module -avoid-version
 if DEBUG
 AM_CXXFLAGS += -g

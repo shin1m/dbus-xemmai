@@ -87,7 +87,7 @@ t_scoped t_message::f_append(int a_type, const char* a_signature, const t_value&
 	auto i = v_i;
 	DBusMessageIter j;
 	if (i) {
-		if (dbus_message_iter_open_container(i, a_type, a_signature, &j) == FALSE) f_throw(L"dbus_message_iter_open_container failed.");
+		if (dbus_message_iter_open_container(i, a_type, a_signature, &j) == FALSE) f_throw(L"dbus_message_iter_open_container failed."sv);
 	} else {
 		dbus_message_iter_init_append(v_value, &j);
 	}
@@ -95,7 +95,7 @@ t_scoped t_message::f_append(int a_type, const char* a_signature, const t_value&
 	try {
 		if (i) {
 			a_callable(f_object());
-			if (dbus_message_iter_close_container(i, &j) == FALSE) f_throw(L"dbus_message_iter_close_container failed.");
+			if (dbus_message_iter_close_container(i, &j) == FALSE) f_throw(L"dbus_message_iter_close_container failed."sv);
 		} else {
 			f_append(a_type, a_signature, a_callable);
 		}
@@ -116,19 +116,19 @@ namespace xemmai
 void t_type_of<xemmaix::dbus::t_message>::f_define(t_extension* a_extension)
 {
 	using namespace xemmaix::dbus;
-	t_define<t_message, t_object>(a_extension, L"Message")
-		(L"acquire", t_member<void(t_message::*)(), &t_message::f_acquire>())
-		(L"release", t_member<void(t_message::*)(), &t_message::f_release>())
-		(L"get_type", t_member<int(t_message::*)() const, &t_message::f_get_type>())
-		(L"get", t_member<t_scoped(t_message::*)(), &t_message::f_get>())
-		(L"append",
+	t_define<t_message, t_object>(a_extension, L"Message"sv)
+		(L"acquire"sv, t_member<void(t_message::*)(), &t_message::f_acquire>())
+		(L"release"sv, t_member<void(t_message::*)(), &t_message::f_release>())
+		(L"get_type"sv, t_member<int(t_message::*)() const, &t_message::f_get_type>())
+		(L"get"sv, t_member<t_scoped(t_message::*)(), &t_message::f_get>())
+		(L"append"sv,
 			t_member<t_scoped(t_message::*)(bool), &t_message::f_append>(),
 			t_member<t_scoped(t_message::*)(int, intptr_t), &t_message::f_append>(),
 			t_member<t_scoped(t_message::*)(intptr_t), &t_message::f_append>(),
 			t_member<t_scoped(t_message::*)(double), &t_message::f_append>(),
-			t_member<t_scoped(t_message::*)(int, const std::wstring&), &t_message::f_append>(),
-			t_member<t_scoped(t_message::*)(const std::wstring&), &t_message::f_append>(),
-			t_member<t_scoped(t_message::*)(int, const std::wstring&, const t_value&), &t_message::f_append>(),
+			t_member<t_scoped(t_message::*)(int, std::wstring_view), &t_message::f_append>(),
+			t_member<t_scoped(t_message::*)(std::wstring_view), &t_message::f_append>(),
+			t_member<t_scoped(t_message::*)(int, std::wstring_view, const t_value&), &t_message::f_append>(),
 			t_member<t_scoped(t_message::*)(int, const t_value&), &t_message::f_append>()
 		)
 	;
@@ -137,10 +137,10 @@ void t_type_of<xemmaix::dbus::t_message>::f_define(t_extension* a_extension)
 t_scoped t_type_of<xemmaix::dbus::t_message>::f_do_construct(t_stacked* a_stack, size_t a_n)
 {
 	return t_overload<
-		t_construct_with<t_scoped(*)(t_type*, const std::wstring*, const std::wstring&, const std::wstring*, const std::wstring&), xemmaix::dbus::t_message::f_construct>,
+		t_construct_with<t_scoped(*)(t_type*, const t_string*, std::wstring_view, const t_string*, std::wstring_view), xemmaix::dbus::t_message::f_construct>,
 		t_construct_with<t_scoped(*)(t_type*, xemmaix::dbus::t_message&), xemmaix::dbus::t_message::f_construct>,
-		t_construct_with<t_scoped(*)(t_type*, const std::wstring&, const std::wstring&, const std::wstring&), xemmaix::dbus::t_message::f_construct>,
-		t_construct_with<t_scoped(*)(t_type*, xemmaix::dbus::t_message&, const std::wstring&, const std::wstring*), xemmaix::dbus::t_message::f_construct>
+		t_construct_with<t_scoped(*)(t_type*, std::wstring_view, std::wstring_view, std::wstring_view), xemmaix::dbus::t_message::f_construct>,
+		t_construct_with<t_scoped(*)(t_type*, xemmaix::dbus::t_message&, std::wstring_view, const t_string*), xemmaix::dbus::t_message::f_construct>
 	>::t_bind<xemmaix::dbus::t_message>::f_do(this, a_stack, a_n);
 }
 

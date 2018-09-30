@@ -42,28 +42,28 @@ public:
 		return p ? p : new t_message(a_value);
 	}
 	using t_base::f_construct;
-	static t_scoped f_construct(t_type* a_class, const std::wstring* a_destination, const std::wstring& a_path, const std::wstring* a_interface, const std::wstring& a_method)
+	static t_scoped f_construct(t_type* a_class, const t_string* a_destination, std::wstring_view a_path, const t_string* a_interface, std::wstring_view a_method)
 	{
 		DBusMessage* p = dbus_message_new_method_call(a_destination ? f_convert(*a_destination).c_str() : NULL, f_convert(a_path).c_str(), a_interface ? f_convert(*a_interface).c_str() : NULL, f_convert(a_method).c_str());
-		if (p == NULL) f_throw(L"dbus_message_new_method_call failed.");
+		if (p == NULL) f_throw(L"dbus_message_new_method_call failed."sv);
 		return f_construct(p);
 	}
 	static t_scoped f_construct(t_type* a_class, t_message& a_call)
 	{
 		DBusMessage* p = dbus_message_new_method_return(a_call);
-		if (p == NULL) f_throw(L"dbus_message_new_method_return failed.");
+		if (p == NULL) f_throw(L"dbus_message_new_method_return failed."sv);
 		return f_construct(p);
 	}
-	static t_scoped f_construct(t_type* a_class, const std::wstring& a_path, const std::wstring& a_interface, const std::wstring& a_name)
+	static t_scoped f_construct(t_type* a_class, std::wstring_view a_path, std::wstring_view a_interface, std::wstring_view a_name)
 	{
 		DBusMessage* p = dbus_message_new_signal(f_convert(a_path).c_str(), f_convert(a_interface).c_str(), f_convert(a_name).c_str());
-		if (p == NULL) f_throw(L"dbus_message_new_signal failed.");
+		if (p == NULL) f_throw(L"dbus_message_new_signal failed."sv);
 		return f_construct(p);
 	}
-	static t_scoped f_construct(t_type* a_class, t_message& a_to, const std::wstring& a_name, const std::wstring* a_message)
+	static t_scoped f_construct(t_type* a_class, t_message& a_to, std::wstring_view a_name, const t_string* a_message)
 	{
 		DBusMessage* p = dbus_message_new_error(a_to, f_convert(a_name).c_str(), a_message ? f_convert(*a_message).c_str() : NULL);
-		if (p == NULL) f_throw(L"dbus_message_new_error failed.");
+		if (p == NULL) f_throw(L"dbus_message_new_error failed."sv);
 		return f_construct(p);
 	}
 
@@ -83,9 +83,9 @@ public:
 	t_scoped f_append(int a_type, const void* a_value)
 	{
 		if (v_i) {
-			if (dbus_message_iter_append_basic(v_i, a_type, a_value) != TRUE) f_throw(L"dbus_message_iter_append_basic failed.");
+			if (dbus_message_iter_append_basic(v_i, a_type, a_value) != TRUE) f_throw(L"dbus_message_iter_append_basic failed."sv);
 		} else {
-			if (dbus_message_append_args(v_value, a_type, a_value, DBUS_TYPE_INVALID) != TRUE) f_throw(L"dbus_message_append_args failed.");
+			if (dbus_message_append_args(v_value, a_type, a_value, DBUS_TYPE_INVALID) != TRUE) f_throw(L"dbus_message_append_args failed."sv);
 		}
 		return f_object();
 	}
@@ -106,7 +106,7 @@ public:
 		case DBUS_TYPE_UINT64:
 			return f_append(a_type, &a_value);
 		default:
-			f_throw(L"invalid type.");
+			f_throw(L"invalid type."sv);
 		}
 	}
 	t_scoped f_append(intptr_t a_value)
@@ -117,7 +117,7 @@ public:
 	{
 		return f_append(DBUS_TYPE_DOUBLE, &a_value);
 	}
-	t_scoped f_append(int a_type, const std::wstring& a_value)
+	t_scoped f_append(int a_type, std::wstring_view a_value)
 	{
 		switch (a_type) {
 		case DBUS_TYPE_STRING:
@@ -125,25 +125,25 @@ public:
 		case DBUS_TYPE_SIGNATURE:
 			break;
 		default:
-			f_throw(L"invalid type.");
+			f_throw(L"invalid type."sv);
 		}
 		std::string value = f_convert(a_value);
 		const char* p = value.c_str();
 		return f_append(a_type, &p);
 	}
-	t_scoped f_append(const std::wstring& a_value)
+	t_scoped f_append(std::wstring_view a_value)
 	{
 		return f_append(DBUS_TYPE_STRING, a_value);
 	}
 	t_scoped f_append(int a_type, const char* a_signature, const t_value& a_callable);
-	t_scoped f_append(int a_type, const std::wstring& a_signature, const t_value& a_callable)
+	t_scoped f_append(int a_type, std::wstring_view a_signature, const t_value& a_callable)
 	{
 		switch (a_type) {
 		case DBUS_TYPE_ARRAY:
 		case DBUS_TYPE_VARIANT:
 			return f_append(a_type, f_convert(a_signature).c_str(), a_callable);
 		default:
-			f_throw(L"invalid type.");
+			f_throw(L"invalid type."sv);
 		}
 	}
 	t_scoped f_append(int a_type, const t_value& a_callable)
@@ -153,7 +153,7 @@ public:
 		case DBUS_TYPE_DICT_ENTRY:
 			return f_append(a_type, NULL, a_callable);
 		default:
-			f_throw(L"invalid type.");
+			f_throw(L"invalid type."sv);
 		}
 	}
 };

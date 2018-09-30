@@ -58,7 +58,7 @@ class t_connection : public t_proxy_of<t_connection, DBusConnection>
 
 	t_connection(DBusConnection* a_value) : t_base(t_session::f_instance()->f_extension()->f_type<t_connection>(), a_value)
 	{
-		if (dbus_connection_add_filter(v_value, f_filter, this, NULL) == FALSE) f_throw(L"dbus_connection_add_filter failed.");
+		if (dbus_connection_add_filter(v_value, f_filter, this, NULL) == FALSE) f_throw(L"dbus_connection_add_filter failed."sv);
 	}
 	virtual void f_destroy();
 
@@ -82,7 +82,7 @@ public:
 		dbus_connection_set_exit_on_disconnect(p, FALSE);
 		return f_construct_shared<t_connection>(p);
 	}
-	static t_scoped f_construct(t_type* a_class, const std::wstring& a_address)
+	static t_scoped f_construct(t_type* a_class, std::wstring_view a_address)
 	{
 		DBusError error;
 		dbus_error_init(&error);
@@ -105,12 +105,12 @@ public:
 	}
 	void f_send(t_message& a_message)
 	{
-		if (dbus_connection_send(v_value, a_message, NULL) == FALSE) f_throw(L"dbus_connection_send failed.");
+		if (dbus_connection_send(v_value, a_message, NULL) == FALSE) f_throw(L"dbus_connection_send failed."sv);
 	}
 	t_scoped f_send_with_reply(t_message& a_message)
 	{
 		DBusPendingCall* p;
-		if (dbus_connection_send_with_reply(v_value, a_message, &p, DBUS_TIMEOUT_USE_DEFAULT) == FALSE) f_throw(L"dbus_connection_send_with_reply failed.");
+		if (dbus_connection_send_with_reply(v_value, a_message, &p, DBUS_TIMEOUT_USE_DEFAULT) == FALSE) f_throw(L"dbus_connection_send_with_reply failed."sv);
 		return t_reply::f_construct(p, v_value);
 	}
 	void f_add_disconnected(t_scoped&& a_callable)
@@ -121,7 +121,7 @@ public:
 	{
 		v_disconnecteds.erase(a_callable);
 	}
-	int f_request_name(const std::wstring& a_name, unsigned int a_flags)
+	int f_request_name(std::wstring_view a_name, unsigned int a_flags)
 	{
 		DBusError error;
 		dbus_error_init(&error);
@@ -133,7 +133,7 @@ public:
 		}
 		return result;
 	}
-	int f_release_name(const std::wstring& a_name)
+	int f_release_name(std::wstring_view a_name)
 	{
 		DBusError error;
 		dbus_error_init(&error);
@@ -145,8 +145,8 @@ public:
 		}
 		return result;
 	}
-	void f_add_match(int a_type, const std::wstring& a_path, const std::wstring& a_interface, const std::wstring& a_member, t_scoped&& a_callable);
-	void f_remove_match(int a_type, const std::wstring& a_path, const std::wstring& a_interface, const std::wstring& a_member);
+	void f_add_match(int a_type, std::wstring_view a_path, std::wstring_view a_interface, std::wstring_view a_member, t_scoped&& a_callable);
+	void f_remove_match(int a_type, std::wstring_view a_path, std::wstring_view a_interface, std::wstring_view a_member);
 };
 
 class t_container_builder

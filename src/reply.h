@@ -29,7 +29,7 @@ class t_reply : public t_proxy_of<t_reply, DBusPendingCall>
 	static t_scoped f_steal(DBusPendingCall* a_value)
 	{
 		auto message = dbus_pending_call_steal_reply(a_value);
-		if (message == NULL) f_throw(L"dbus_pending_call_steal_reply failed.");
+		if (message == NULL) f_throw(L"dbus_pending_call_steal_reply failed."sv);
 		return t_message::f_construct(message);
 	}
 
@@ -76,7 +76,7 @@ public:
 		}, new t_scoped(std::move(a_callable)), [](auto a_data)
 		{
 			delete static_cast<t_scoped*>(a_data);
-		}) == FALSE) f_throw(L"dbus_pending_call_set_notify failed.");
+		}) == FALSE) f_throw(L"dbus_pending_call_set_notify failed."sv);
 	}
 };
 
