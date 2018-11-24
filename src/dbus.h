@@ -84,26 +84,22 @@ public:
 
 class t_proxy : public t_entry
 {
-	t_session* v_session;
-	t_scoped v_object;
+	t_session* v_session = t_session::f_instance();
+	t_scoped v_object = t_object::f_of(this);
 
 protected:
 	static void f_destroy(void* a_p)
 	{
 		static_cast<t_proxy*>(a_p)->f_destroy();
 	}
-	static t_scoped f_transfer(t_proxy* a_proxy)
+	static t_scoped f_transfer(t_scoped&& a_value)
 	{
-		++a_proxy->v_n;
-		return a_proxy->v_object;
+		++a_value->f_as<t_proxy>().v_n;
+		return std::move(a_value);
 	}
 
 	size_t v_n = 0;
 
-	t_proxy(t_type* a_class) : v_session(t_session::f_instance()), v_object(t_object::f_allocate(a_class, false))
-	{
-		v_object.f_pointer__(this);
-	}
 	XEMMAIX__DBUS__EXPORT virtual void f_destroy();
 
 public:
@@ -111,10 +107,6 @@ public:
 	bool f_valid() const
 	{
 		return v_session == t_session::f_instance();
-	}
-	t_object* f_object() const
-	{
-		return v_object;
 	}
 };
 
@@ -125,20 +117,20 @@ protected:
 	typedef t_proxy_of t_base;
 
 	template<typename T_type>
-	static t_scoped f_construct_shared(T_value* a_value)
+	static t_scoped f_construct_shared(t_type* a_class, T_value* a_value)
 	{
 		T* p = f_from(a_value);
 		if (p) {
 			if (p->v_n > 0) T::f_unreference(a_value);
-			return f_transfer(p);
+			return f_transfer(t_object::f_of(p));
 		} else {
-			return f_transfer(new T_type(a_value));
+			return f_transfer(a_class->template f_new<T_type>(false, a_value));
 		}
 	}
 
 	T_value* v_value;
 
-	t_proxy_of(t_type* a_class, T_value* a_value) : t_proxy(a_class), v_value(a_value)
+	t_proxy_of(T_value* a_value) : v_value(a_value)
 	{
 		T::f_set_data(v_value, v_slot, this, t_proxy::f_destroy);
 	}
@@ -151,9 +143,9 @@ public:
 	{
 		return static_cast<T*>(T::f_get_data(a_value, v_slot));
 	}
-	static t_scoped f_construct(T_value* a_value)
+	static t_scoped f_construct(t_type* a_class, T_value* a_value)
 	{
-		return f_transfer(new T(a_value));
+		return f_transfer(a_class->template f_new<T>(false, a_value));
 	}
 
 	virtual void f_dispose();
@@ -264,11 +256,11 @@ struct t_holds : t_underivable<t_bears<T>>
 	struct t_cast
 	{
 		template<typename T1>
-		static T0* f_call(T1&& a_object)
+		static T0& f_call(T1&& a_object)
 		{
-			auto p = static_cast<T0*>(t_base::f_object(std::forward<T1>(a_object))->f_pointer());
-			if (!p->f_valid()) f_throw(L"accessing from other thread."sv);
-			if (!*p) f_throw(L"already destroyed."sv);
+			auto& p = t_base::f_object(std::forward<T1>(a_object))->template f_as<T0>();
+			if (!p.f_valid()) f_throw(L"accessing from other thread."sv);
+			if (!p) f_throw(L"already destroyed."sv);
 			return p;
 		}
 	};
@@ -278,7 +270,7 @@ struct t_holds : t_underivable<t_bears<T>>
 		template<typename T1>
 		static T0 f_call(T1&& a_object)
 		{
-			return *t_cast<typename t_fundamental<T0>::t_type>::f_call(std::forward<T1>(a_object));
+			return t_cast<typename t_fundamental<T0>::t_type>::f_call(std::forward<T1>(a_object));
 		}
 	};
 	template<typename T0>
@@ -287,7 +279,7 @@ struct t_holds : t_underivable<t_bears<T>>
 		template<typename T1>
 		static T0* f_call(T1&& a_object)
 		{
-			return reinterpret_cast<size_t>(t_base::f_object(std::forward<T1>(a_object))) == t_value::e_tag__NULL ? nullptr : t_cast<T0>::f_call(std::forward<T1>(a_object));
+			return reinterpret_cast<size_t>(t_base::f_object(std::forward<T1>(a_object))) == t_value::e_tag__NULL ? nullptr : &t_cast<T0>::f_call(std::forward<T1>(a_object));
 		}
 	};
 	template<typename T0>
@@ -325,15 +317,15 @@ struct t_holds : t_underivable<t_bears<T>>
 	template<typename T_extension, typename T_value>
 	static t_scoped f_transfer(T_extension* a_extension, T_value&& a_value)
 	{
-		return a_value->f_object();
+		return t_object::f_of(a_value);
 	}
 
 	using t_underivable<t_bears<T>>::t_underivable;
 	static void f_do_finalize(t_object* a_this)
 	{
-		auto p = static_cast<T*>(a_this->f_pointer());
-		assert(!*p);
-		delete p;
+		auto& p = a_this->f_as<T>();
+		assert(!p);
+		p.~T();
 	}
 	void f_do_instantiate(t_stacked* a_stack, size_t a_n)
 	{

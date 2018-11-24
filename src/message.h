@@ -8,6 +8,7 @@ namespace xemmaix::dbus
 
 class t_message : public t_proxy_of<t_message, DBusMessage>
 {
+	friend class t_type_of<t_object>;
 	friend class t_proxy_of<t_message, DBusMessage>;
 
 	static dbus_bool_t f_set_data(DBusMessage* a_value, dbus_int32_t a_slot, void* a_user, DBusFreeFunction a_destroy)
@@ -29,42 +30,45 @@ class t_message : public t_proxy_of<t_message, DBusMessage>
 
 	DBusMessageIter* v_i = nullptr;
 
-	t_message(DBusMessage* a_value) : t_base(t_session::f_instance()->f_extension()->f_type<t_message>(), a_value)
-	{
-	}
+	using t_base::t_base;
 	void f_get(t_array& a_array, DBusMessageIter& a_i);
 
 public:
-	static t_message* f_wrap(DBusMessage* a_value)
+	static t_scoped f_wrap(DBusMessage* a_value)
 	{
-		if (!a_value) return nullptr;
+		if (!a_value) return {};
 		t_message* p = f_from(a_value);
-		return p ? p : new t_message(a_value);
+		if (p) return t_object::f_of(p);
+		return f_new<t_message>(t_session::f_instance()->f_extension(), false, a_value);
 	}
 	using t_base::f_construct;
 	static t_scoped f_construct(t_type* a_class, const t_string* a_destination, std::wstring_view a_path, const t_string* a_interface, std::wstring_view a_method)
 	{
 		DBusMessage* p = dbus_message_new_method_call(a_destination ? f_convert(*a_destination).c_str() : NULL, f_convert(a_path).c_str(), a_interface ? f_convert(*a_interface).c_str() : NULL, f_convert(a_method).c_str());
 		if (p == NULL) f_throw(L"dbus_message_new_method_call failed."sv);
-		return f_construct(p);
+		return f_construct(a_class, p);
 	}
 	static t_scoped f_construct(t_type* a_class, t_message& a_call)
 	{
 		DBusMessage* p = dbus_message_new_method_return(a_call);
 		if (p == NULL) f_throw(L"dbus_message_new_method_return failed."sv);
-		return f_construct(p);
+		return f_construct(a_class, p);
 	}
 	static t_scoped f_construct(t_type* a_class, std::wstring_view a_path, std::wstring_view a_interface, std::wstring_view a_name)
 	{
 		DBusMessage* p = dbus_message_new_signal(f_convert(a_path).c_str(), f_convert(a_interface).c_str(), f_convert(a_name).c_str());
 		if (p == NULL) f_throw(L"dbus_message_new_signal failed."sv);
-		return f_construct(p);
+		return f_construct(a_class, p);
 	}
 	static t_scoped f_construct(t_type* a_class, t_message& a_to, std::wstring_view a_name, const t_string* a_message)
 	{
 		DBusMessage* p = dbus_message_new_error(a_to, f_convert(a_name).c_str(), a_message ? f_convert(*a_message).c_str() : NULL);
 		if (p == NULL) f_throw(L"dbus_message_new_error failed."sv);
-		return f_construct(p);
+		return f_construct(a_class, p);
+	}
+	static t_scoped f_construct(DBusMessage* a_value)
+	{
+		return f_construct(t_session::f_instance()->f_extension()->f_type<t_message>(), a_value);
 	}
 
 	void f_acquire()
@@ -87,7 +91,7 @@ public:
 		} else {
 			if (dbus_message_append_args(v_value, a_type, a_value, DBUS_TYPE_INVALID) != TRUE) f_throw(L"dbus_message_append_args failed."sv);
 		}
-		return f_object();
+		return t_object::f_of(this);
 	}
 	t_scoped f_append(bool a_value)
 	{

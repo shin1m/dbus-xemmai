@@ -8,6 +8,7 @@ namespace xemmaix::dbus
 
 class t_reply : public t_proxy_of<t_reply, DBusPendingCall>
 {
+	friend class t_type_of<t_object>;
 	friend class t_proxy_of<t_reply, DBusPendingCall>;
 
 	static dbus_bool_t f_set_data(DBusPendingCall* a_value, dbus_int32_t a_slot, void* a_user, DBusFreeFunction a_destroy)
@@ -35,7 +36,7 @@ class t_reply : public t_proxy_of<t_reply, DBusPendingCall>
 
 	DBusConnection* v_connection;
 
-	t_reply(DBusPendingCall* a_value, DBusConnection* a_connection) : t_base(t_session::f_instance()->f_extension()->f_type<t_reply>(), a_value), v_connection(a_connection)
+	t_reply(DBusPendingCall* a_value, DBusConnection* a_connection) : t_base(a_value), v_connection(a_connection)
 	{
 		dbus_connection_ref(v_connection);
 	}
@@ -44,7 +45,7 @@ class t_reply : public t_proxy_of<t_reply, DBusPendingCall>
 public:
 	static t_scoped f_construct(DBusPendingCall* a_value, DBusConnection* a_connection)
 	{
-		return a_value == NULL ? nullptr : f_transfer(new t_reply(a_value, a_connection));
+		return a_value == NULL ? nullptr : f_transfer(f_new<t_reply>(t_session::f_instance()->f_extension(), false, a_value, a_connection));
 	}
 
 	virtual void f_dispose();

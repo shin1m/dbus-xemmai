@@ -10,6 +10,7 @@ namespace xemmaix::dbus
 
 class t_connection : public t_proxy_of<t_connection, DBusConnection>
 {
+	friend class t_type_of<t_object>;
 	friend class t_proxy_of<t_connection, DBusConnection>;
 
 	struct t_match
@@ -56,18 +57,19 @@ class t_connection : public t_proxy_of<t_connection, DBusConnection>
 	std::set<t_scoped> v_disconnecteds;
 	std::map<t_match, t_scoped> v_matches;
 
-	t_connection(DBusConnection* a_value) : t_base(t_session::f_instance()->f_extension()->f_type<t_connection>(), a_value)
+	t_connection(DBusConnection* a_value) : t_base(a_value)
 	{
 		if (dbus_connection_add_filter(v_value, f_filter, this, NULL) == FALSE) f_throw(L"dbus_connection_add_filter failed."sv);
 	}
 	virtual void f_destroy();
 
 public:
-	static t_connection* f_wrap(DBusConnection* a_value)
+	static t_scoped f_wrap(DBusConnection* a_value)
 	{
-		if (!a_value) return nullptr;
+		if (!a_value) return {};
 		t_connection* p = f_from(a_value);
-		return p ? p : new t_connection(a_value);
+		if (p) return t_object::f_of(p);
+		return f_new<t_connection>(t_session::f_instance()->f_extension(), false, a_value);
 	}
 	static t_scoped f_construct(t_type* a_class, DBusBusType a_type)
 	{
@@ -80,7 +82,7 @@ public:
 			f_throw(s);
 		}
 		dbus_connection_set_exit_on_disconnect(p, FALSE);
-		return f_construct_shared<t_connection>(p);
+		return f_construct_shared<t_connection>(a_class, p);
 	}
 	static t_scoped f_construct(t_type* a_class, std::wstring_view a_address)
 	{
@@ -92,7 +94,7 @@ public:
 			dbus_error_free(&error);
 			f_throw(s);
 		}
-		return f_construct_shared<t_connection>(p);
+		return f_construct_shared<t_connection>(a_class, p);
 	}
 
 	void f_acquire()

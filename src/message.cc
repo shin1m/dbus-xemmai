@@ -94,13 +94,13 @@ t_scoped t_message::f_append(int a_type, const char* a_signature, const t_value&
 	v_i = &j;
 	try {
 		if (i) {
-			a_callable(f_object());
+			a_callable(t_object::f_of(this));
 			if (dbus_message_iter_close_container(i, &j) == FALSE) f_throw(L"dbus_message_iter_close_container failed."sv);
 		} else {
 			f_append(a_type, a_signature, a_callable);
 		}
 		v_i = i;
-		return f_object();
+		return t_object::f_of(this);
 	} catch (...) {
 		if (i) dbus_message_iter_abandon_container(i, &j);
 		v_i = i;

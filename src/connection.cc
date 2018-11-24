@@ -14,7 +14,7 @@ std::fprintf(stderr, "filter: %d, %s, %s, %s\n", dbus_message_get_type(a_message
 	const char* member = dbus_message_get_member(a_message);
 	auto i = p->v_matches.find(t_match(dbus_message_get_type(a_message), path == NULL ? "" : path, interface == NULL ? "" : interface, member == NULL ? "" : member));
 	if (i != p->v_matches.end()) {
-		i->second(t_message::f_wrap(a_message)->f_object());
+		i->second(t_message::f_wrap(a_message));
 		return DBUS_HANDLER_RESULT_HANDLED;
 	} else if (dbus_message_is_signal(a_message, DBUS_INTERFACE_LOCAL, "Disconnected") != FALSE) {
 		for (const auto& q : p->v_disconnecteds) q();
