@@ -54,8 +54,8 @@ class t_connection : public t_proxy_of<t_connection, DBusConnection>
 	}
 	static DBusHandlerResult f_filter(DBusConnection* a_connection, DBusMessage* a_message, void* a_data);
 
-	std::set<t_scoped> v_disconnecteds;
-	std::map<t_match, t_scoped> v_matches;
+	std::set<t_rvalue> v_disconnecteds;
+	std::map<t_match, t_rvalue> v_matches;
 
 	t_connection(DBusConnection* a_value) : t_base(a_value)
 	{
@@ -64,14 +64,14 @@ class t_connection : public t_proxy_of<t_connection, DBusConnection>
 	virtual void f_destroy();
 
 public:
-	static t_scoped f_wrap(DBusConnection* a_value)
+	static t_object* f_wrap(DBusConnection* a_value)
 	{
 		if (!a_value) return {};
 		t_connection* p = f_from(a_value);
 		if (p) return t_object::f_of(p);
 		return f_new<t_connection>(t_session::f_instance()->f_extension(), false, a_value);
 	}
-	static t_scoped f_construct(t_type* a_class, DBusBusType a_type)
+	static t_pvalue f_construct(t_type* a_class, DBusBusType a_type)
 	{
 		DBusError error;
 		dbus_error_init(&error);
@@ -84,7 +84,7 @@ public:
 		dbus_connection_set_exit_on_disconnect(p, FALSE);
 		return f_construct_shared<t_connection>(a_class, p);
 	}
-	static t_scoped f_construct(t_type* a_class, std::wstring_view a_address)
+	static t_pvalue f_construct(t_type* a_class, std::wstring_view a_address)
 	{
 		DBusError error;
 		dbus_error_init(&error);
@@ -109,17 +109,17 @@ public:
 	{
 		if (dbus_connection_send(v_value, a_message, NULL) == FALSE) f_throw(L"dbus_connection_send failed."sv);
 	}
-	t_scoped f_send_with_reply(t_message& a_message)
+	t_pvalue f_send_with_reply(t_message& a_message)
 	{
 		DBusPendingCall* p;
 		if (dbus_connection_send_with_reply(v_value, a_message, &p, DBUS_TIMEOUT_USE_DEFAULT) == FALSE) f_throw(L"dbus_connection_send_with_reply failed."sv);
 		return t_reply::f_construct(p, v_value);
 	}
-	void f_add_disconnected(t_scoped&& a_callable)
+	void f_add_disconnected(const t_pvalue& a_callable)
 	{
 		v_disconnecteds.insert(a_callable);
 	}
-	void f_remove_disconnected(const t_value& a_callable)
+	void f_remove_disconnected(const t_pvalue& a_callable)
 	{
 		v_disconnecteds.erase(a_callable);
 	}
@@ -147,7 +147,7 @@ public:
 		}
 		return result;
 	}
-	void f_add_match(int a_type, std::wstring_view a_path, std::wstring_view a_interface, std::wstring_view a_member, t_scoped&& a_callable);
+	void f_add_match(int a_type, std::wstring_view a_path, std::wstring_view a_interface, std::wstring_view a_member, const t_pvalue& a_callable);
 	void f_remove_match(int a_type, std::wstring_view a_path, std::wstring_view a_interface, std::wstring_view a_member);
 };
 
@@ -182,7 +182,7 @@ struct t_type_of<xemmaix::dbus::t_connection> : xemmaix::dbus::t_holds<xemmaix::
 	static void f_define(t_extension* a_extension);
 
 	using t_base::t_base;
-	t_scoped f_do_construct(t_stacked* a_stack, size_t a_n);
+	t_pvalue f_do_construct(t_pvalue* a_stack, size_t a_n);
 };
 
 }

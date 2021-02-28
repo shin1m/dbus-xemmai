@@ -34,7 +34,7 @@ class t_message : public t_proxy_of<t_message, DBusMessage>
 	void f_get(t_array& a_array, DBusMessageIter& a_i);
 
 public:
-	static t_scoped f_wrap(DBusMessage* a_value)
+	static t_object* f_wrap(DBusMessage* a_value)
 	{
 		if (!a_value) return {};
 		t_message* p = f_from(a_value);
@@ -42,31 +42,31 @@ public:
 		return f_new<t_message>(t_session::f_instance()->f_extension(), false, a_value);
 	}
 	using t_base::f_construct;
-	static t_scoped f_construct(t_type* a_class, const t_string* a_destination, std::wstring_view a_path, const t_string* a_interface, std::wstring_view a_method)
+	static t_pvalue f_construct(t_type* a_class, const t_string* a_destination, std::wstring_view a_path, const t_string* a_interface, std::wstring_view a_method)
 	{
 		DBusMessage* p = dbus_message_new_method_call(a_destination ? f_convert(*a_destination).c_str() : NULL, f_convert(a_path).c_str(), a_interface ? f_convert(*a_interface).c_str() : NULL, f_convert(a_method).c_str());
 		if (p == NULL) f_throw(L"dbus_message_new_method_call failed."sv);
 		return f_construct(a_class, p);
 	}
-	static t_scoped f_construct(t_type* a_class, t_message& a_call)
+	static t_pvalue f_construct(t_type* a_class, t_message& a_call)
 	{
 		DBusMessage* p = dbus_message_new_method_return(a_call);
 		if (p == NULL) f_throw(L"dbus_message_new_method_return failed."sv);
 		return f_construct(a_class, p);
 	}
-	static t_scoped f_construct(t_type* a_class, std::wstring_view a_path, std::wstring_view a_interface, std::wstring_view a_name)
+	static t_pvalue f_construct(t_type* a_class, std::wstring_view a_path, std::wstring_view a_interface, std::wstring_view a_name)
 	{
 		DBusMessage* p = dbus_message_new_signal(f_convert(a_path).c_str(), f_convert(a_interface).c_str(), f_convert(a_name).c_str());
 		if (p == NULL) f_throw(L"dbus_message_new_signal failed."sv);
 		return f_construct(a_class, p);
 	}
-	static t_scoped f_construct(t_type* a_class, t_message& a_to, std::wstring_view a_name, const t_string* a_message)
+	static t_pvalue f_construct(t_type* a_class, t_message& a_to, std::wstring_view a_name, const t_string* a_message)
 	{
 		DBusMessage* p = dbus_message_new_error(a_to, f_convert(a_name).c_str(), a_message ? f_convert(*a_message).c_str() : NULL);
 		if (p == NULL) f_throw(L"dbus_message_new_error failed."sv);
 		return f_construct(a_class, p);
 	}
-	static t_scoped f_construct(DBusMessage* a_value)
+	static t_pvalue f_construct(DBusMessage* a_value)
 	{
 		return f_construct(t_session::f_instance()->f_extension()->f_type<t_message>(), a_value);
 	}
@@ -83,8 +83,8 @@ public:
 	{
 		return dbus_message_get_type(v_value);
 	}
-	t_scoped f_get();
-	t_scoped f_append(int a_type, const void* a_value)
+	t_pvalue f_get();
+	t_pvalue f_append(int a_type, const void* a_value)
 	{
 		if (v_i) {
 			if (dbus_message_iter_append_basic(v_i, a_type, a_value) != TRUE) f_throw(L"dbus_message_iter_append_basic failed."sv);
@@ -93,12 +93,12 @@ public:
 		}
 		return t_object::f_of(this);
 	}
-	t_scoped f_append(bool a_value)
+	t_pvalue f_append(bool a_value)
 	{
 		dbus_bool_t value = a_value ? TRUE : FALSE;
 		return f_append(DBUS_TYPE_BOOLEAN, &value);
 	}
-	t_scoped f_append(int a_type, intptr_t a_value)
+	t_pvalue f_append(int a_type, intptr_t a_value)
 	{
 		switch (a_type) {
 		case DBUS_TYPE_BYTE:
@@ -113,15 +113,15 @@ public:
 			f_throw(L"invalid type."sv);
 		}
 	}
-	t_scoped f_append(intptr_t a_value)
+	t_pvalue f_append(intptr_t a_value)
 	{
 		return f_append(DBUS_TYPE_INT32, a_value);
 	}
-	t_scoped f_append(double a_value)
+	t_pvalue f_append(double a_value)
 	{
 		return f_append(DBUS_TYPE_DOUBLE, &a_value);
 	}
-	t_scoped f_append(int a_type, std::wstring_view a_value)
+	t_pvalue f_append(int a_type, std::wstring_view a_value)
 	{
 		switch (a_type) {
 		case DBUS_TYPE_STRING:
@@ -135,12 +135,12 @@ public:
 		const char* p = value.c_str();
 		return f_append(a_type, &p);
 	}
-	t_scoped f_append(std::wstring_view a_value)
+	t_pvalue f_append(std::wstring_view a_value)
 	{
 		return f_append(DBUS_TYPE_STRING, a_value);
 	}
-	t_scoped f_append(int a_type, const char* a_signature, const t_value& a_callable);
-	t_scoped f_append(int a_type, std::wstring_view a_signature, const t_value& a_callable)
+	t_pvalue f_append(int a_type, const char* a_signature, const t_pvalue& a_callable);
+	t_pvalue f_append(int a_type, std::wstring_view a_signature, const t_pvalue& a_callable)
 	{
 		switch (a_type) {
 		case DBUS_TYPE_ARRAY:
@@ -150,7 +150,7 @@ public:
 			f_throw(L"invalid type."sv);
 		}
 	}
-	t_scoped f_append(int a_type, const t_value& a_callable)
+	t_pvalue f_append(int a_type, const t_pvalue& a_callable)
 	{
 		switch (a_type) {
 		case DBUS_TYPE_STRUCT:
@@ -173,7 +173,7 @@ struct t_type_of<xemmaix::dbus::t_message> : xemmaix::dbus::t_holds<xemmaix::dbu
 	static void f_define(t_extension* a_extension);
 
 	using t_base::t_base;
-	t_scoped f_do_construct(t_stacked* a_stack, size_t a_n);
+	t_pvalue f_do_construct(t_pvalue* a_stack, size_t a_n);
 };
 
 }

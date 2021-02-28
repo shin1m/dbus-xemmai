@@ -61,7 +61,7 @@ void t_proxy::f_destroy()
 namespace
 {
 
-void f_main(t_extension* a_extension, const t_value& a_callable)
+void f_main(t_extension* a_extension, const t_pvalue& a_callable)
 {
 	t_session session(a_extension);
 	a_callable();
@@ -75,7 +75,7 @@ t_extension::t_extension(t_object* a_module) : xemmai::t_extension(a_module)
 	t_type_of<t_reply>::f_define(this);
 	t_type_of<DBusBusType>::f_define(this);
 	t_type_of<t_connection>::f_define(this);
-	f_define<void(*)(t_extension*, const t_value&), f_main>(this, L"main"sv);
+	f_define<void(*)(t_extension*, const t_pvalue&), f_main>(this, L"main"sv);
 	a_module->f_put(t_symbol::f_instantiate(L"TIMEOUT_INFINITE"sv), f_as(DBUS_TIMEOUT_INFINITE));
 	a_module->f_put(t_symbol::f_instantiate(L"TIMEOUT_USE_DEFAULT"sv), f_as(DBUS_TIMEOUT_USE_DEFAULT));
 	a_module->f_put(t_symbol::f_instantiate(L"LITTLE_ENDIAN"sv), f_as(static_cast<int>(DBUS_LITTLE_ENDIAN)));

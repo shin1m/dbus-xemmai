@@ -85,17 +85,17 @@ public:
 class t_proxy : public t_entry
 {
 	t_session* v_session = t_session::f_instance();
-	t_scoped v_object = t_object::f_of(this);
+	t_root v_object = t_object::f_of(this);
 
 protected:
 	static void f_destroy(void* a_p)
 	{
 		static_cast<t_proxy*>(a_p)->f_destroy();
 	}
-	static t_scoped f_transfer(t_scoped&& a_value)
+	static t_pvalue f_transfer(t_object* a_value)
 	{
 		++a_value->f_as<t_proxy>().v_n;
-		return std::move(a_value);
+		return a_value;
 	}
 
 	size_t v_n = 0;
@@ -117,7 +117,7 @@ protected:
 	typedef t_proxy_of t_base;
 
 	template<typename T_type>
-	static t_scoped f_construct_shared(t_type* a_class, T_value* a_value)
+	static t_pvalue f_construct_shared(t_type* a_class, T_value* a_value)
 	{
 		T* p = f_from(a_value);
 		if (p) {
@@ -143,7 +143,7 @@ public:
 	{
 		return static_cast<T*>(T::f_get_data(a_value, v_slot));
 	}
-	static t_scoped f_construct(t_type* a_class, T_value* a_value)
+	static t_pvalue f_construct(t_type* a_class, T_value* a_value)
 	{
 		return f_transfer(a_class->template f_new<T>(false, a_value));
 	}
@@ -212,7 +212,7 @@ public:
 		return const_cast<t_extension*>(this)->f_type_slot<T>();
 	}
 	template<typename T>
-	t_scoped f_as(T&& a_value) const
+	t_pvalue f_as(T&& a_value) const
 	{
 		typedef t_type_of<typename t_fundamental<T>::t_type> t;
 		return t::f_transfer(f_extension<typename t::t_extension>(), std::forward<T>(a_value));
@@ -279,7 +279,7 @@ struct t_holds : t_underivable<t_bears<T>>
 		template<typename T1>
 		static T0* f_call(T1&& a_object)
 		{
-			return reinterpret_cast<size_t>(t_base::f_object(std::forward<T1>(a_object))) == t_value::e_tag__NULL ? nullptr : &t_cast<T0>::f_call(std::forward<T1>(a_object));
+			return t_base::f_object(std::forward<T1>(a_object)) ? &t_cast<T0>::f_call(std::forward<T1>(a_object)) : nullptr;
 		}
 	};
 	template<typename T0>
@@ -289,7 +289,7 @@ struct t_holds : t_underivable<t_bears<T>>
 		static bool f_call(T1&& a_object)
 		{
 			auto p = t_base::f_object(std::forward<T1>(a_object));
-			return reinterpret_cast<size_t>(p) >= t_value::e_tag__OBJECT && p->f_type()->template f_derives<typename t_fundamental<T0>::t_type>();
+			return reinterpret_cast<uintptr_t>(p) >= e_tag__OBJECT && p->f_type()->template f_derives<typename t_fundamental<T0>::t_type>();
 		}
 	};
 	template<typename T0>
@@ -299,12 +299,12 @@ struct t_holds : t_underivable<t_bears<T>>
 		static bool f_call(T1 a_object)
 		{
 			auto p = t_base::f_object(std::forward<T1>(a_object));
-			switch (reinterpret_cast<size_t>(p)) {
-			case t_value::e_tag__NULL:
+			switch (reinterpret_cast<uintptr_t>(p)) {
+			case e_tag__NULL:
 				return true;
-			case t_value::e_tag__BOOLEAN:
-			case t_value::e_tag__INTEGER:
-			case t_value::e_tag__FLOAT:
+			case e_tag__BOOLEAN:
+			case e_tag__INTEGER:
+			case e_tag__FLOAT:
 				return false;
 			default:
 				return p->f_type()->template f_derives<typename t_fundamental<T0>::t_type>();
@@ -315,7 +315,7 @@ struct t_holds : t_underivable<t_bears<T>>
 	typedef t_holds t_base;
 
 	template<typename T_extension, typename T_value>
-	static t_scoped f_transfer(T_extension* a_extension, T_value&& a_value)
+	static t_pvalue f_transfer(T_extension* a_extension, T_value&& a_value)
 	{
 		return t_object::f_of(a_value);
 	}
@@ -327,10 +327,9 @@ struct t_holds : t_underivable<t_bears<T>>
 		assert(!p);
 		p.~T();
 	}
-	void f_do_instantiate(t_stacked* a_stack, size_t a_n)
+	void f_do_instantiate(t_pvalue* a_stack, size_t a_n)
 	{
-		t_destruct_n destruct(a_stack, a_n);
-		a_stack[0].f_construct(this->f_construct(a_stack, a_n));
+		a_stack[0] = this->f_construct(a_stack, a_n);
 	}
 };
 
