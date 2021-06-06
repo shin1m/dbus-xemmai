@@ -13,8 +13,6 @@
 #include <iterator>
 #include <locale>
 #include <xemmai/convert.h>
-#include <xemmai/array.h>
-#include <xemmai/bytes.h>
 #include <dbus/dbus.h>
 
 namespace xemmaix::dbus
@@ -23,7 +21,7 @@ namespace xemmaix::dbus
 using namespace xemmai;
 
 class t_proxy;
-class t_extension;
+class t_library;
 class t_message;
 class t_reply;
 class t_connection;
@@ -60,7 +58,7 @@ class t_session : public t_entry
 
 	static XEMMAI__PORTABLE__THREAD t_session* v_instance;
 
-	t_extension* v_extension;
+	t_library* v_library;
 	std::wstring_convert<std::codecvt_utf8<wchar_t>> v_convert;
 
 public:
@@ -74,11 +72,11 @@ public:
 	}
 #endif
 
-	t_session(t_extension* a_extension);
+	t_session(t_library* a_library);
 	~t_session();
-	t_extension* f_extension() const
+	t_library* f_library() const
 	{
-		return v_extension;
+		return v_library;
 	}
 };
 
@@ -124,7 +122,7 @@ protected:
 			if (p->v_n > 0) T::f_unreference(a_value);
 			return f_transfer(t_object::f_of(p));
 		} else {
-			return f_transfer(a_class->template f_new<T_type>(false, a_value));
+			return f_transfer(a_class->template f_new<T_type>(a_value));
 		}
 	}
 
@@ -145,7 +143,7 @@ public:
 	}
 	static t_pvalue f_construct(t_type* a_class, T_value* a_value)
 	{
-		return f_transfer(a_class->template f_new<T>(false, a_value));
+		return f_transfer(a_class->template f_new<T>(a_value));
 	}
 
 	virtual void f_dispose();
@@ -186,7 +184,7 @@ void t_proxy_of<T, T_value>::f_dispose()
 	}
 }
 
-class t_extension : public xemmai::t_extension
+class t_library : public xemmai::t_library
 {
 	t_slot_of<t_type> v_type_message;
 	t_slot_of<t_type> v_type_reply;
@@ -194,10 +192,11 @@ class t_extension : public xemmai::t_extension
 	t_slot_of<t_type> v_type_connection;
 
 public:
-	t_extension(t_object* a_module);
+	using xemmai::t_library::t_library;
 	virtual void f_scan(t_scan a_scan);
+	virtual std::vector<std::pair<t_root, t_rvalue>> f_define();
 	template<typename T>
-	const T* f_extension() const
+	const T* f_library() const
 	{
 		return f_global();
 	}
@@ -209,48 +208,29 @@ public:
 	template<typename T>
 	t_type* f_type() const
 	{
-		return const_cast<t_extension*>(this)->f_type_slot<T>();
+		return const_cast<t_library*>(this)->f_type_slot<T>();
 	}
 	template<typename T>
 	t_pvalue f_as(T&& a_value) const
 	{
 		typedef t_type_of<typename t_fundamental<T>::t_type> t;
-		return t::f_transfer(f_extension<typename t::t_extension>(), std::forward<T>(a_value));
+		return t::f_transfer(f_library<typename t::t_library>(), std::forward<T>(a_value));
 	}
 };
 
 template<>
-inline const t_extension* t_extension::f_extension<t_extension>() const
+inline const t_library* t_library::f_library<t_library>() const
 {
 	return this;
 }
 
-template<>
-inline t_slot_of<t_type>& t_extension::f_type_slot<t_message>()
-{
-	return v_type_message;
-}
-
-template<>
-inline t_slot_of<t_type>& t_extension::f_type_slot<t_reply>()
-{
-	return v_type_reply;
-}
-
-template<>
-inline t_slot_of<t_type>& t_extension::f_type_slot<DBusBusType>()
-{
-	return v_type_bus_type;
-}
-
-template<>
-inline t_slot_of<t_type>& t_extension::f_type_slot<t_connection>()
-{
-	return v_type_connection;
-}
+XEMMAI__LIBRARY__TYPE(t_library, message)
+XEMMAI__LIBRARY__TYPE(t_library, reply)
+XEMMAI__LIBRARY__TYPE_AS(t_library, DBusBusType, bus_type)
+XEMMAI__LIBRARY__TYPE(t_library, connection)
 
 template<typename T>
-struct t_holds : t_underivable<t_bears<T>>
+struct t_holds : t_bears<T>
 {
 	template<typename T0>
 	struct t_cast
@@ -311,16 +291,16 @@ struct t_holds : t_underivable<t_bears<T>>
 			}
 		}
 	};
-	typedef xemmaix::dbus::t_extension t_extension;
+	typedef xemmaix::dbus::t_library t_library;
 	typedef t_holds t_base;
 
-	template<typename T_extension, typename T_value>
-	static t_pvalue f_transfer(T_extension* a_extension, T_value&& a_value)
+	template<typename T_library, typename T_value>
+	static t_pvalue f_transfer(T_library* a_library, T_value&& a_value)
 	{
 		return t_object::f_of(a_value);
 	}
 
-	using t_underivable<t_bears<T>>::t_underivable;
+	using t_bears<T>::t_bears;
 	static void f_do_finalize(t_object* a_this)
 	{
 		auto& p = a_this->f_as<T>();
@@ -339,9 +319,9 @@ namespace xemmai
 {
 
 template<>
-struct t_type_of<DBusBusType> : t_enum_of<DBusBusType, xemmaix::dbus::t_extension>
+struct t_type_of<DBusBusType> : t_enum_of<DBusBusType, xemmaix::dbus::t_library>
 {
-	static void f_define(t_extension* a_extension);
+	static t_object* f_define(t_library* a_library);
 
 	using t_base::t_base;
 };

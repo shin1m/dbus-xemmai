@@ -45,7 +45,7 @@ class t_reply : public t_proxy_of<t_reply, DBusPendingCall>
 public:
 	static t_pvalue f_construct(DBusPendingCall* a_value, DBusConnection* a_connection)
 	{
-		return a_value == NULL ? nullptr : f_transfer(f_new<t_reply>(t_session::f_instance()->f_extension(), false, a_value, a_connection));
+		return a_value == NULL ? nullptr : f_transfer(f_new<t_reply>(t_session::f_instance()->f_library(), a_value, a_connection));
 	}
 
 	virtual void f_dispose();
@@ -89,7 +89,7 @@ namespace xemmai
 template<>
 struct t_type_of<xemmaix::dbus::t_reply> : t_uninstantiatable<xemmaix::dbus::t_holds<xemmaix::dbus::t_reply>>
 {
-	static void f_define(t_extension* a_extension);
+	static void f_define(t_library* a_library);
 
 	using t_base::t_base;
 	static size_t f_do_call(t_object* a_this, t_pvalue* a_stack, size_t a_n);

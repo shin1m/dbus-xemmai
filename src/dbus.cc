@@ -33,7 +33,7 @@ t_session* t_session::f_instance()
 }
 #endif
 
-t_session::t_session(t_extension* a_extension) : t_entry(false), v_extension(a_extension)
+t_session::t_session(t_library* a_library) : t_entry(false), v_library(a_library)
 {
 	if (v_instance) f_throw(L"already inside main."sv);
 	v_instance = this;
@@ -61,89 +61,15 @@ void t_proxy::f_destroy()
 namespace
 {
 
-void f_main(t_extension* a_extension, const t_pvalue& a_callable)
+void f_main(t_library* a_library, const t_pvalue& a_callable)
 {
-	t_session session(a_extension);
+	t_session session(a_library);
 	a_callable();
 }
 
 }
 
-t_extension::t_extension(t_object* a_module) : xemmai::t_extension(a_module)
-{
-	t_type_of<t_message>::f_define(this);
-	t_type_of<t_reply>::f_define(this);
-	t_type_of<DBusBusType>::f_define(this);
-	t_type_of<t_connection>::f_define(this);
-	f_define<void(*)(t_extension*, const t_pvalue&), f_main>(this, L"main"sv);
-	a_module->f_put(t_symbol::f_instantiate(L"TIMEOUT_INFINITE"sv), f_as(DBUS_TIMEOUT_INFINITE));
-	a_module->f_put(t_symbol::f_instantiate(L"TIMEOUT_USE_DEFAULT"sv), f_as(DBUS_TIMEOUT_USE_DEFAULT));
-	a_module->f_put(t_symbol::f_instantiate(L"LITTLE_ENDIAN"sv), f_as(static_cast<int>(DBUS_LITTLE_ENDIAN)));
-	a_module->f_put(t_symbol::f_instantiate(L"BIG_ENDIAN"sv), f_as(static_cast<int>(DBUS_BIG_ENDIAN)));
-	a_module->f_put(t_symbol::f_instantiate(L"MAJOR_PROTOCOL_VERSION"sv), f_as(DBUS_MAJOR_PROTOCOL_VERSION));
-	a_module->f_put(t_symbol::f_instantiate(L"TYPE_INVALID"sv), f_as(DBUS_TYPE_INVALID));
-	a_module->f_put(t_symbol::f_instantiate(L"TYPE_BYTE"sv), f_as(DBUS_TYPE_BYTE));
-	a_module->f_put(t_symbol::f_instantiate(L"TYPE_BOOLEAN"sv), f_as(DBUS_TYPE_BOOLEAN));
-	a_module->f_put(t_symbol::f_instantiate(L"TYPE_INT16"sv), f_as(DBUS_TYPE_INT16));
-	a_module->f_put(t_symbol::f_instantiate(L"TYPE_UINT16"sv), f_as(DBUS_TYPE_UINT16));
-	a_module->f_put(t_symbol::f_instantiate(L"TYPE_INT32"sv), f_as(DBUS_TYPE_INT32));
-	a_module->f_put(t_symbol::f_instantiate(L"TYPE_UINT32"sv), f_as(DBUS_TYPE_UINT32));
-	a_module->f_put(t_symbol::f_instantiate(L"TYPE_INT64"sv), f_as(DBUS_TYPE_INT64));
-	a_module->f_put(t_symbol::f_instantiate(L"TYPE_UINT64"sv), f_as(DBUS_TYPE_UINT64));
-	a_module->f_put(t_symbol::f_instantiate(L"TYPE_DOUBLE"sv), f_as(DBUS_TYPE_DOUBLE));
-	a_module->f_put(t_symbol::f_instantiate(L"TYPE_STRING"sv), f_as(DBUS_TYPE_STRING));
-	a_module->f_put(t_symbol::f_instantiate(L"TYPE_OBJECT_PATH"sv), f_as(DBUS_TYPE_OBJECT_PATH));
-	a_module->f_put(t_symbol::f_instantiate(L"TYPE_SIGNATURE"sv), f_as(DBUS_TYPE_SIGNATURE));
-	a_module->f_put(t_symbol::f_instantiate(L"TYPE_UNIX_FD"sv), f_as(DBUS_TYPE_UNIX_FD));
-	a_module->f_put(t_symbol::f_instantiate(L"TYPE_ARRAY"sv), f_as(DBUS_TYPE_ARRAY));
-	a_module->f_put(t_symbol::f_instantiate(L"TYPE_VARIANT"sv), f_as(DBUS_TYPE_VARIANT));
-	a_module->f_put(t_symbol::f_instantiate(L"TYPE_STRUCT"sv), f_as(DBUS_TYPE_STRUCT));
-	a_module->f_put(t_symbol::f_instantiate(L"TYPE_DICT_ENTRY"sv), f_as(DBUS_TYPE_DICT_ENTRY));
-	a_module->f_put(t_symbol::f_instantiate(L"NUMBER_OF_TYPES"sv), f_as(DBUS_NUMBER_OF_TYPES));
-	a_module->f_put(t_symbol::f_instantiate(L"STRUCT_BEGIN_CHAR"sv), f_as(DBUS_STRUCT_BEGIN_CHAR));
-	a_module->f_put(t_symbol::f_instantiate(L"STRUCT_END_CHAR"sv), f_as(DBUS_STRUCT_END_CHAR));
-	a_module->f_put(t_symbol::f_instantiate(L"DICT_ENTRY_BEGIN_CHAR"sv), f_as(DBUS_DICT_ENTRY_BEGIN_CHAR));
-	a_module->f_put(t_symbol::f_instantiate(L"DICT_ENTRY_END_CHAR"sv), f_as(DBUS_DICT_ENTRY_END_CHAR));
-	a_module->f_put(t_symbol::f_instantiate(L"MAXIMUM_NAME_LENGTH"sv), f_as(DBUS_MAXIMUM_NAME_LENGTH));
-	a_module->f_put(t_symbol::f_instantiate(L"MAXIMUM_SIGNATURE_LENGTH"sv), f_as(DBUS_MAXIMUM_SIGNATURE_LENGTH));
-	a_module->f_put(t_symbol::f_instantiate(L"MAXIMUM_MATCH_RULE_LENGTH"sv), f_as(DBUS_MAXIMUM_MATCH_RULE_LENGTH));
-	a_module->f_put(t_symbol::f_instantiate(L"MAXIMUM_MATCH_RULE_ARG_NUMBER"sv), f_as(DBUS_MAXIMUM_MATCH_RULE_ARG_NUMBER));
-	a_module->f_put(t_symbol::f_instantiate(L"MAXIMUM_ARRAY_LENGTH"sv), f_as(DBUS_MAXIMUM_ARRAY_LENGTH));
-	a_module->f_put(t_symbol::f_instantiate(L"MAXIMUM_ARRAY_LENGTH_BITS"sv), f_as(DBUS_MAXIMUM_ARRAY_LENGTH_BITS));
-	a_module->f_put(t_symbol::f_instantiate(L"MAXIMUM_MESSAGE_LENGTH_BITS"sv), f_as(DBUS_MAXIMUM_MESSAGE_LENGTH_BITS));
-	a_module->f_put(t_symbol::f_instantiate(L"MAXIMUM_MESSAGE_LENGTH"sv), f_as(DBUS_MAXIMUM_MESSAGE_LENGTH));
-	a_module->f_put(t_symbol::f_instantiate(L"MAXIMUM_MESSAGE_UNIX_FDS"sv), f_as(DBUS_MAXIMUM_MESSAGE_UNIX_FDS));
-	a_module->f_put(t_symbol::f_instantiate(L"MAXIMUM_MESSAGE_UNIX_FDS_BITS"sv), f_as(DBUS_MAXIMUM_MESSAGE_UNIX_FDS_BITS));
-	a_module->f_put(t_symbol::f_instantiate(L"MAXIMUM_TYPE_RECURSION_DEPTH"sv), f_as(DBUS_MAXIMUM_TYPE_RECURSION_DEPTH));
-	a_module->f_put(t_symbol::f_instantiate(L"MESSAGE_TYPE_INVALID"sv), f_as(DBUS_MESSAGE_TYPE_INVALID));
-	a_module->f_put(t_symbol::f_instantiate(L"MESSAGE_TYPE_METHOD_CALL"sv), f_as(DBUS_MESSAGE_TYPE_METHOD_CALL));
-	a_module->f_put(t_symbol::f_instantiate(L"MESSAGE_TYPE_METHOD_RETURN"sv), f_as(DBUS_MESSAGE_TYPE_METHOD_RETURN));
-	a_module->f_put(t_symbol::f_instantiate(L"MESSAGE_TYPE_ERROR"sv), f_as(DBUS_MESSAGE_TYPE_ERROR));
-	a_module->f_put(t_symbol::f_instantiate(L"MESSAGE_TYPE_SIGNAL"sv), f_as(DBUS_MESSAGE_TYPE_SIGNAL));
-	a_module->f_put(t_symbol::f_instantiate(L"NUM_MESSAGE_TYPES"sv), f_as(DBUS_NUM_MESSAGE_TYPES));
-	a_module->f_put(t_symbol::f_instantiate(L"SERVICE_DBUS"sv), f_as(std::wstring(XEMMAI__MACRO__L(DBUS_SERVICE_DBUS))));
-	a_module->f_put(t_symbol::f_instantiate(L"PATH_DBUS"sv), f_as(std::wstring(XEMMAI__MACRO__L(DBUS_PATH_DBUS))));
-	a_module->f_put(t_symbol::f_instantiate(L"PATH_LOCAL"sv), f_as(std::wstring(XEMMAI__MACRO__L(DBUS_PATH_LOCAL))));
-	a_module->f_put(t_symbol::f_instantiate(L"INTERFACE_DBUS"sv), f_as(std::wstring(XEMMAI__MACRO__L(DBUS_INTERFACE_DBUS))));
-	a_module->f_put(t_symbol::f_instantiate(L"INTERFACE_INTROSPECTABLE"sv), f_as(std::wstring(XEMMAI__MACRO__L(DBUS_INTERFACE_INTROSPECTABLE))));
-	a_module->f_put(t_symbol::f_instantiate(L"INTERFACE_PROPERTIES"sv), f_as(std::wstring(XEMMAI__MACRO__L(DBUS_INTERFACE_PROPERTIES))));
-	a_module->f_put(t_symbol::f_instantiate(L"INTERFACE_PEER"sv), f_as(std::wstring(XEMMAI__MACRO__L(DBUS_INTERFACE_PEER))));
-	a_module->f_put(t_symbol::f_instantiate(L"INTERFACE_LOCAL"sv), f_as(std::wstring(XEMMAI__MACRO__L(DBUS_INTERFACE_LOCAL))));
-	a_module->f_put(t_symbol::f_instantiate(L"NAME_FLAG_ALLOW_REPLACEMENT"sv), f_as(DBUS_NAME_FLAG_ALLOW_REPLACEMENT));
-	a_module->f_put(t_symbol::f_instantiate(L"NAME_FLAG_REPLACE_EXISTING"sv), f_as(DBUS_NAME_FLAG_REPLACE_EXISTING));
-	a_module->f_put(t_symbol::f_instantiate(L"NAME_FLAG_DO_NOT_QUEUE"sv), f_as(DBUS_NAME_FLAG_DO_NOT_QUEUE));
-	a_module->f_put(t_symbol::f_instantiate(L"REQUEST_NAME_REPLY_PRIMARY_OWNER"sv), f_as(DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER));
-	a_module->f_put(t_symbol::f_instantiate(L"REQUEST_NAME_REPLY_IN_QUEUE"sv), f_as(DBUS_REQUEST_NAME_REPLY_IN_QUEUE));
-	a_module->f_put(t_symbol::f_instantiate(L"REQUEST_NAME_REPLY_EXISTS"sv), f_as(DBUS_REQUEST_NAME_REPLY_EXISTS));
-	a_module->f_put(t_symbol::f_instantiate(L"REQUEST_NAME_REPLY_ALREADY_OWNER"sv), f_as(DBUS_REQUEST_NAME_REPLY_ALREADY_OWNER));
-	a_module->f_put(t_symbol::f_instantiate(L"RELEASE_NAME_REPLY_RELEASED"sv), f_as(DBUS_RELEASE_NAME_REPLY_RELEASED));
-	a_module->f_put(t_symbol::f_instantiate(L"RELEASE_NAME_REPLY_NON_EXISTENT"sv), f_as(DBUS_RELEASE_NAME_REPLY_NON_EXISTENT));
-	a_module->f_put(t_symbol::f_instantiate(L"RELEASE_NAME_REPLY_NOT_OWNER"sv), f_as(DBUS_RELEASE_NAME_REPLY_NOT_OWNER));
-	a_module->f_put(t_symbol::f_instantiate(L"START_REPLY_SUCCESS"sv), f_as(DBUS_START_REPLY_SUCCESS));
-	a_module->f_put(t_symbol::f_instantiate(L"START_REPLY_ALREADY_RUNNING"sv), f_as(DBUS_START_REPLY_ALREADY_RUNNING));
-}
-
-void t_extension::f_scan(t_scan a_scan)
+void t_library::f_scan(t_scan a_scan)
 {
 	a_scan(v_type_message);
 	a_scan(v_type_reply);
@@ -151,23 +77,103 @@ void t_extension::f_scan(t_scan a_scan)
 	a_scan(v_type_connection);
 }
 
-}
-
-namespace xemmai
+std::vector<std::pair<t_root, t_rvalue>> t_library::f_define()
 {
-
-void t_type_of<DBusBusType>::f_define(t_extension* a_extension)
-{
-	t_define<DBusBusType, intptr_t>(a_extension, L"BusType"sv)
-		(L"SESSION"sv, DBUS_BUS_SESSION)
-		(L"SYSTEM"sv, DBUS_BUS_SYSTEM)
-		(L"STARTER"sv, DBUS_BUS_STARTER)
+	t_type_of<t_message>::f_define(this);
+	t_type_of<t_reply>::f_define(this);
+	t_type_of<t_connection>::f_define(this);
+	return t_define(this)
+		(L"Message"sv, t_object::f_of(v_type_message))
+		(L"Reply"sv, t_object::f_of(v_type_reply))
+		(L"BusType"sv, t_type_of<DBusBusType>::f_define(this))
+		(L"Connection"sv, t_object::f_of(v_type_connection))
+		(L"main"sv, t_static<void(*)(t_library*, const t_pvalue&), f_main>())
+		(L"TIMEOUT_INFINITE"sv, DBUS_TIMEOUT_INFINITE)
+		(L"TIMEOUT_USE_DEFAULT"sv, DBUS_TIMEOUT_USE_DEFAULT)
+		(L"LITTLE_ENDIAN"sv, static_cast<int>(DBUS_LITTLE_ENDIAN))
+		(L"BIG_ENDIAN"sv, static_cast<int>(DBUS_BIG_ENDIAN))
+		(L"MAJOR_PROTOCOL_VERSION"sv, DBUS_MAJOR_PROTOCOL_VERSION)
+		(L"TYPE_INVALID"sv, DBUS_TYPE_INVALID)
+		(L"TYPE_BYTE"sv, DBUS_TYPE_BYTE)
+		(L"TYPE_BOOLEAN"sv, DBUS_TYPE_BOOLEAN)
+		(L"TYPE_INT16"sv, DBUS_TYPE_INT16)
+		(L"TYPE_UINT16"sv, DBUS_TYPE_UINT16)
+		(L"TYPE_INT32"sv, DBUS_TYPE_INT32)
+		(L"TYPE_UINT32"sv, DBUS_TYPE_UINT32)
+		(L"TYPE_INT64"sv, DBUS_TYPE_INT64)
+		(L"TYPE_UINT64"sv, DBUS_TYPE_UINT64)
+		(L"TYPE_DOUBLE"sv, DBUS_TYPE_DOUBLE)
+		(L"TYPE_STRING"sv, DBUS_TYPE_STRING)
+		(L"TYPE_OBJECT_PATH"sv, DBUS_TYPE_OBJECT_PATH)
+		(L"TYPE_SIGNATURE"sv, DBUS_TYPE_SIGNATURE)
+		(L"TYPE_UNIX_FD"sv, DBUS_TYPE_UNIX_FD)
+		(L"TYPE_ARRAY"sv, DBUS_TYPE_ARRAY)
+		(L"TYPE_VARIANT"sv, DBUS_TYPE_VARIANT)
+		(L"TYPE_STRUCT"sv, DBUS_TYPE_STRUCT)
+		(L"TYPE_DICT_ENTRY"sv, DBUS_TYPE_DICT_ENTRY)
+		(L"NUMBER_OF_TYPES"sv, DBUS_NUMBER_OF_TYPES)
+		(L"STRUCT_BEGIN_CHAR"sv, DBUS_STRUCT_BEGIN_CHAR)
+		(L"STRUCT_END_CHAR"sv, DBUS_STRUCT_END_CHAR)
+		(L"DICT_ENTRY_BEGIN_CHAR"sv, DBUS_DICT_ENTRY_BEGIN_CHAR)
+		(L"DICT_ENTRY_END_CHAR"sv, DBUS_DICT_ENTRY_END_CHAR)
+		(L"MAXIMUM_NAME_LENGTH"sv, DBUS_MAXIMUM_NAME_LENGTH)
+		(L"MAXIMUM_SIGNATURE_LENGTH"sv, DBUS_MAXIMUM_SIGNATURE_LENGTH)
+		(L"MAXIMUM_MATCH_RULE_LENGTH"sv, DBUS_MAXIMUM_MATCH_RULE_LENGTH)
+		(L"MAXIMUM_MATCH_RULE_ARG_NUMBER"sv, DBUS_MAXIMUM_MATCH_RULE_ARG_NUMBER)
+		(L"MAXIMUM_ARRAY_LENGTH"sv, DBUS_MAXIMUM_ARRAY_LENGTH)
+		(L"MAXIMUM_ARRAY_LENGTH_BITS"sv, DBUS_MAXIMUM_ARRAY_LENGTH_BITS)
+		(L"MAXIMUM_MESSAGE_LENGTH_BITS"sv, DBUS_MAXIMUM_MESSAGE_LENGTH_BITS)
+		(L"MAXIMUM_MESSAGE_LENGTH"sv, DBUS_MAXIMUM_MESSAGE_LENGTH)
+		(L"MAXIMUM_MESSAGE_UNIX_FDS"sv, DBUS_MAXIMUM_MESSAGE_UNIX_FDS)
+		(L"MAXIMUM_MESSAGE_UNIX_FDS_BITS"sv, DBUS_MAXIMUM_MESSAGE_UNIX_FDS_BITS)
+		(L"MAXIMUM_TYPE_RECURSION_DEPTH"sv, DBUS_MAXIMUM_TYPE_RECURSION_DEPTH)
+		(L"MESSAGE_TYPE_INVALID"sv, DBUS_MESSAGE_TYPE_INVALID)
+		(L"MESSAGE_TYPE_METHOD_CALL"sv, DBUS_MESSAGE_TYPE_METHOD_CALL)
+		(L"MESSAGE_TYPE_METHOD_RETURN"sv, DBUS_MESSAGE_TYPE_METHOD_RETURN)
+		(L"MESSAGE_TYPE_ERROR"sv, DBUS_MESSAGE_TYPE_ERROR)
+		(L"MESSAGE_TYPE_SIGNAL"sv, DBUS_MESSAGE_TYPE_SIGNAL)
+		(L"NUM_MESSAGE_TYPES"sv, DBUS_NUM_MESSAGE_TYPES)
+		(L"SERVICE_DBUS"sv, std::wstring(XEMMAI__MACRO__L(DBUS_SERVICE_DBUS)))
+		(L"PATH_DBUS"sv, std::wstring(XEMMAI__MACRO__L(DBUS_PATH_DBUS)))
+		(L"PATH_LOCAL"sv, std::wstring(XEMMAI__MACRO__L(DBUS_PATH_LOCAL)))
+		(L"INTERFACE_DBUS"sv, std::wstring(XEMMAI__MACRO__L(DBUS_INTERFACE_DBUS)))
+		(L"INTERFACE_INTROSPECTABLE"sv, std::wstring(XEMMAI__MACRO__L(DBUS_INTERFACE_INTROSPECTABLE)))
+		(L"INTERFACE_PROPERTIES"sv, std::wstring(XEMMAI__MACRO__L(DBUS_INTERFACE_PROPERTIES)))
+		(L"INTERFACE_PEER"sv, std::wstring(XEMMAI__MACRO__L(DBUS_INTERFACE_PEER)))
+		(L"INTERFACE_LOCAL"sv, std::wstring(XEMMAI__MACRO__L(DBUS_INTERFACE_LOCAL)))
+		(L"NAME_FLAG_ALLOW_REPLACEMENT"sv, DBUS_NAME_FLAG_ALLOW_REPLACEMENT)
+		(L"NAME_FLAG_REPLACE_EXISTING"sv, DBUS_NAME_FLAG_REPLACE_EXISTING)
+		(L"NAME_FLAG_DO_NOT_QUEUE"sv, DBUS_NAME_FLAG_DO_NOT_QUEUE)
+		(L"REQUEST_NAME_REPLY_PRIMARY_OWNER"sv, DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER)
+		(L"REQUEST_NAME_REPLY_IN_QUEUE"sv, DBUS_REQUEST_NAME_REPLY_IN_QUEUE)
+		(L"REQUEST_NAME_REPLY_EXISTS"sv, DBUS_REQUEST_NAME_REPLY_EXISTS)
+		(L"REQUEST_NAME_REPLY_ALREADY_OWNER"sv, DBUS_REQUEST_NAME_REPLY_ALREADY_OWNER)
+		(L"RELEASE_NAME_REPLY_RELEASED"sv, DBUS_RELEASE_NAME_REPLY_RELEASED)
+		(L"RELEASE_NAME_REPLY_NON_EXISTENT"sv, DBUS_RELEASE_NAME_REPLY_NON_EXISTENT)
+		(L"RELEASE_NAME_REPLY_NOT_OWNER"sv, DBUS_RELEASE_NAME_REPLY_NOT_OWNER)
+		(L"START_REPLY_SUCCESS"sv, DBUS_START_REPLY_SUCCESS)
+		(L"START_REPLY_ALREADY_RUNNING"sv, DBUS_START_REPLY_ALREADY_RUNNING)
 	;
 }
 
 }
 
-XEMMAI__MODULE__FACTORY(xemmai::t_object* a_module)
+namespace xemmai
 {
-	return new xemmaix::dbus::t_extension(a_module);
+
+t_object* t_type_of<DBusBusType>::f_define(t_library* a_library)
+{
+	t_define{a_library}.f_derive<DBusBusType, intptr_t>();
+	return a_library->f_type<DBusBusType>()->f_do_derive({{}, t_define(a_library)
+		(L"SESSION"sv, DBUS_BUS_SESSION)
+		(L"SYSTEM"sv, DBUS_BUS_SYSTEM)
+		(L"STARTER"sv, DBUS_BUS_STARTER)
+	});
+}
+
+}
+
+XEMMAI__MODULE__FACTORY(xemmai::t_library::t_handle* a_handle)
+{
+	return xemmai::f_new<xemmaix::dbus::t_library>(a_handle);
 }

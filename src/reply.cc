@@ -20,13 +20,13 @@ void t_reply::f_dispose()
 namespace xemmai
 {
 
-void t_type_of<xemmaix::dbus::t_reply>::f_define(t_extension* a_extension)
+void t_type_of<xemmaix::dbus::t_reply>::f_define(t_library* a_library)
 {
 	using namespace xemmaix::dbus;
-	t_define<t_reply, t_object>(a_extension, L"Reply"sv)
+	t_define{a_library}
 		(L"acquire"sv, t_member<void(t_reply::*)(), &t_reply::f_acquire>())
 		(L"release"sv, t_member<void(t_reply::*)(), &t_reply::f_release>())
-	;
+	.f_derive<t_reply, t_object>();
 }
 
 size_t t_type_of<xemmaix::dbus::t_reply>::f_do_call(t_object* a_this, t_pvalue* a_stack, size_t a_n)

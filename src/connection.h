@@ -69,7 +69,7 @@ public:
 		if (!a_value) return {};
 		t_connection* p = f_from(a_value);
 		if (p) return t_object::f_of(p);
-		return f_new<t_connection>(t_session::f_instance()->f_extension(), false, a_value);
+		return f_new<t_connection>(t_session::f_instance()->f_library(), a_value);
 	}
 	static t_pvalue f_construct(t_type* a_class, DBusBusType a_type)
 	{
@@ -179,7 +179,7 @@ namespace xemmai
 template<>
 struct t_type_of<xemmaix::dbus::t_connection> : xemmaix::dbus::t_holds<xemmaix::dbus::t_connection>
 {
-	static void f_define(t_extension* a_extension);
+	static void f_define(t_library* a_library);
 
 	using t_base::t_base;
 	t_pvalue f_do_construct(t_pvalue* a_stack, size_t a_n);

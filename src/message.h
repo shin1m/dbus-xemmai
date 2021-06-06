@@ -31,7 +31,7 @@ class t_message : public t_proxy_of<t_message, DBusMessage>
 	DBusMessageIter* v_i = nullptr;
 
 	using t_base::t_base;
-	void f_get(t_array& a_array, DBusMessageIter& a_i);
+	void f_get(t_list& a_list, DBusMessageIter& a_i);
 
 public:
 	static t_object* f_wrap(DBusMessage* a_value)
@@ -39,7 +39,7 @@ public:
 		if (!a_value) return {};
 		t_message* p = f_from(a_value);
 		if (p) return t_object::f_of(p);
-		return f_new<t_message>(t_session::f_instance()->f_extension(), false, a_value);
+		return f_new<t_message>(t_session::f_instance()->f_library(), a_value);
 	}
 	using t_base::f_construct;
 	static t_pvalue f_construct(t_type* a_class, const t_string* a_destination, std::wstring_view a_path, const t_string* a_interface, std::wstring_view a_method)
@@ -68,7 +68,7 @@ public:
 	}
 	static t_pvalue f_construct(DBusMessage* a_value)
 	{
-		return f_construct(t_session::f_instance()->f_extension()->f_type<t_message>(), a_value);
+		return f_construct(t_session::f_instance()->f_library()->f_type<t_message>(), a_value);
 	}
 
 	void f_acquire()
@@ -170,7 +170,7 @@ namespace xemmai
 template<>
 struct t_type_of<xemmaix::dbus::t_message> : xemmaix::dbus::t_holds<xemmaix::dbus::t_message>
 {
-	static void f_define(t_extension* a_extension);
+	static void f_define(t_library* a_library);
 
 	using t_base::t_base;
 	t_pvalue f_do_construct(t_pvalue* a_stack, size_t a_n);

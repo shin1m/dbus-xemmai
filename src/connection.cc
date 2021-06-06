@@ -69,10 +69,10 @@ void t_connection::f_remove_match(int a_type, std::wstring_view a_path, std::wst
 namespace xemmai
 {
 
-void t_type_of<xemmaix::dbus::t_connection>::f_define(t_extension* a_extension)
+void t_type_of<xemmaix::dbus::t_connection>::f_define(t_library* a_library)
 {
 	using namespace xemmaix::dbus;
-	t_define<t_connection, t_object>(a_extension, L"Connection"sv)
+	t_define{a_library}
 		(L"acquire"sv, t_member<void(t_connection::*)(), &t_connection::f_acquire>())
 		(L"release"sv, t_member<void(t_connection::*)(), &t_connection::f_release>())
 		(L"send"sv, t_member<void(t_connection::*)(t_message&), &t_connection::f_send>())
@@ -83,7 +83,7 @@ void t_type_of<xemmaix::dbus::t_connection>::f_define(t_extension* a_extension)
 		(L"release_name"sv, t_member<int(t_connection::*)(std::wstring_view), &t_connection::f_release_name>())
 		(L"add_match"sv, t_member<void(t_connection::*)(int, std::wstring_view, std::wstring_view, std::wstring_view, const t_pvalue&), &t_connection::f_add_match>())
 		(L"remove_match"sv, t_member<void(t_connection::*)(int, std::wstring_view, std::wstring_view, std::wstring_view), &t_connection::f_remove_match>())
-	;
+	.f_derive<t_connection, t_object>();
 }
 
 t_pvalue t_type_of<xemmaix::dbus::t_connection>::f_do_construct(t_pvalue* a_stack, size_t a_n)

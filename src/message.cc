@@ -3,7 +3,7 @@
 namespace xemmaix::dbus
 {
 
-void t_message::f_get(t_array& a_array, DBusMessageIter& a_i)
+void t_message::f_get(t_list& a_list, DBusMessageIter& a_i)
 {
 	for (;; dbus_message_iter_next(&a_i)) {
 		int type = dbus_message_iter_get_arg_type(&a_i);
@@ -14,19 +14,19 @@ void t_message::f_get(t_array& a_array, DBusMessageIter& a_i)
 		case DBUS_TYPE_STRUCT:
 		case DBUS_TYPE_DICT_ENTRY:
 			{
-				auto x = t_array::f_instantiate();
-				auto& array = f_as<t_array&>(x);
+				auto x = t_list::f_instantiate();
+				auto& list = f_as<t_list&>(x);
 				DBusMessageIter i;
 				dbus_message_iter_recurse(&a_i, &i);
-				f_get(array, i);
-				a_array.f_push(x);
+				f_get(list, i);
+				a_list.f_push(x);
 			}
 			continue;
 		case DBUS_TYPE_VARIANT:
 			{
 				DBusMessageIter i;
 				dbus_message_iter_recurse(&a_i, &i);
-				f_get(a_array, i);
+				f_get(a_list, i);
 			}
 			continue;
 		}
@@ -34,39 +34,39 @@ void t_message::f_get(t_array& a_array, DBusMessageIter& a_i)
 		dbus_message_iter_get_basic(&a_i, &value);
 		switch (type) {
 		case DBUS_TYPE_BYTE:
-			a_array.f_push(value.byt);
+			a_list.f_push(value.byt);
 			break;
 		case DBUS_TYPE_BOOLEAN:
-			a_array.f_push(value.bool_val);
+			a_list.f_push(value.bool_val);
 			break;
 		case DBUS_TYPE_INT16:
-			a_array.f_push(value.i16);
+			a_list.f_push(value.i16);
 			break;
 		case DBUS_TYPE_UINT16:
-			a_array.f_push(value.u16);
+			a_list.f_push(value.u16);
 			break;
 		case DBUS_TYPE_INT32:
-			a_array.f_push(value.i32);
+			a_list.f_push(value.i32);
 			break;
 		case DBUS_TYPE_UINT32:
-			a_array.f_push(value.u32);
+			a_list.f_push(value.u32);
 			break;
 		case DBUS_TYPE_INT64:
-			a_array.f_push(value.i64);
+			a_list.f_push(value.i64);
 			break;
 		case DBUS_TYPE_UINT64:
-			a_array.f_push(value.u64);
+			a_list.f_push(value.u64);
 			break;
 		case DBUS_TYPE_DOUBLE:
-			a_array.f_push(value.dbl);
+			a_list.f_push(value.dbl);
 			break;
 		case DBUS_TYPE_STRING:
 		case DBUS_TYPE_OBJECT_PATH:
 		case DBUS_TYPE_SIGNATURE:
-			a_array.f_push(f_global()->f_as(f_convert(value.str)));
+			a_list.f_push(f_global()->f_as(f_convert(value.str)));
 			break;
 		case DBUS_TYPE_UNIX_FD:
-			a_array.f_push(value.fd);
+			a_list.f_push(value.fd);
 			break;
 		}
 	}
@@ -74,11 +74,11 @@ void t_message::f_get(t_array& a_array, DBusMessageIter& a_i)
 
 t_pvalue t_message::f_get()
 {
-	auto x = t_array::f_instantiate();
-	auto& array = f_as<t_array&>(x);
+	auto x = t_list::f_instantiate();
+	auto& list = f_as<t_list&>(x);
 	DBusMessageIter i;
 	dbus_message_iter_init(v_value, &i);
-	f_get(array, i);
+	f_get(list, i);
 	return x;
 }
 
@@ -113,10 +113,10 @@ t_pvalue t_message::f_append(int a_type, const char* a_signature, const t_pvalue
 namespace xemmai
 {
 
-void t_type_of<xemmaix::dbus::t_message>::f_define(t_extension* a_extension)
+void t_type_of<xemmaix::dbus::t_message>::f_define(t_library* a_library)
 {
 	using namespace xemmaix::dbus;
-	t_define<t_message, t_object>(a_extension, L"Message"sv)
+	t_define{a_library}
 		(L"acquire"sv, t_member<void(t_message::*)(), &t_message::f_acquire>())
 		(L"release"sv, t_member<void(t_message::*)(), &t_message::f_release>())
 		(L"get_type"sv, t_member<int(t_message::*)() const, &t_message::f_get_type>())
@@ -131,7 +131,7 @@ void t_type_of<xemmaix::dbus::t_message>::f_define(t_extension* a_extension)
 			t_member<t_pvalue(t_message::*)(int, std::wstring_view, const t_pvalue&), &t_message::f_append>(),
 			t_member<t_pvalue(t_message::*)(int, const t_pvalue&), &t_message::f_append>()
 		)
-	;
+	.f_derive<t_message, t_object>();
 }
 
 t_pvalue t_type_of<xemmaix::dbus::t_message>::f_do_construct(t_pvalue* a_stack, size_t a_n)
