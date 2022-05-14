@@ -83,10 +83,10 @@ std::vector<std::pair<t_root, t_rvalue>> t_library::f_define()
 	t_type_of<t_reply>::f_define(this);
 	t_type_of<t_connection>::f_define(this);
 	return t_define(this)
-		(L"Message"sv, t_object::f_of(v_type_message))
-		(L"Reply"sv, t_object::f_of(v_type_reply))
+		(L"Message"sv, static_cast<t_object*>(v_type_message))
+		(L"Reply"sv, static_cast<t_object*>(v_type_reply))
 		(L"BusType"sv, t_type_of<DBusBusType>::f_define(this))
-		(L"Connection"sv, t_object::f_of(v_type_connection))
+		(L"Connection"sv, static_cast<t_object*>(v_type_connection))
 		(L"main"sv, t_static<void(*)(t_library*, const t_pvalue&), f_main>())
 		(L"TIMEOUT_INFINITE"sv, DBUS_TIMEOUT_INFINITE)
 		(L"TIMEOUT_USE_DEFAULT"sv, DBUS_TIMEOUT_USE_DEFAULT)
