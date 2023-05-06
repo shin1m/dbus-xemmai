@@ -37,7 +37,7 @@ void t_message::f_get(t_list& a_list, DBusMessageIter& a_i)
 			a_list.f_push(value.byt);
 			break;
 		case DBUS_TYPE_BOOLEAN:
-			a_list.f_push(value.bool_val);
+			a_list.f_push(value.bool_val != FALSE);
 			break;
 		case DBUS_TYPE_INT16:
 			a_list.f_push(value.i16);
@@ -121,16 +121,22 @@ void t_type_of<xemmaix::dbus::t_message>::f_define(t_library* a_library)
 		(L"release"sv, t_member<void(t_message::*)(), &t_message::f_release>())
 		(L"get_type"sv, t_member<int(t_message::*)() const, &t_message::f_get_type>())
 		(L"get"sv, t_member<t_pvalue(t_message::*)(), &t_message::f_get>())
-		(L"append"sv,
-			t_member<t_pvalue(t_message::*)(bool), &t_message::f_append>(),
-			t_member<t_pvalue(t_message::*)(int, intptr_t), &t_message::f_append>(),
-			t_member<t_pvalue(t_message::*)(intptr_t), &t_message::f_append>(),
-			t_member<t_pvalue(t_message::*)(double), &t_message::f_append>(),
-			t_member<t_pvalue(t_message::*)(int, std::wstring_view), &t_message::f_append>(),
-			t_member<t_pvalue(t_message::*)(std::wstring_view), &t_message::f_append>(),
-			t_member<t_pvalue(t_message::*)(int, std::wstring_view, const t_pvalue&), &t_message::f_append>(),
-			t_member<t_pvalue(t_message::*)(int, const t_pvalue&), &t_message::f_append>()
-		)
+		(L"boolean"sv, t_member<t_pvalue(t_message::*)(bool), &t_message::f_boolean>())
+		(L"byte"sv, t_member<t_pvalue(t_message::*)(uint8_t), &t_message::f_number<DBUS_TYPE_BYTE, uint8_t>>())
+		(L"int16"sv, t_member<t_pvalue(t_message::*)(int16_t), &t_message::f_number<DBUS_TYPE_INT16, int16_t>>())
+		(L"uint16"sv, t_member<t_pvalue(t_message::*)(uint16_t), &t_message::f_number<DBUS_TYPE_UINT16, uint16_t>>())
+		(L"int32"sv, t_member<t_pvalue(t_message::*)(int32_t), &t_message::f_number<DBUS_TYPE_INT32, int32_t>>())
+		(L"uint32"sv, t_member<t_pvalue(t_message::*)(uint32_t), &t_message::f_number<DBUS_TYPE_UINT32, uint32_t>>())
+		(L"int64"sv, t_member<t_pvalue(t_message::*)(int64_t), &t_message::f_number<DBUS_TYPE_INT64, int64_t>>())
+		(L"uint64"sv, t_member<t_pvalue(t_message::*)(uint64_t), &t_message::f_number<DBUS_TYPE_UINT64, uint64_t>>())
+		(L"double"sv, t_member<t_pvalue(t_message::*)(double), &t_message::f_number<DBUS_TYPE_DOUBLE, double>>())
+		(L"string"sv, t_member<t_pvalue(t_message::*)(std::wstring_view), &t_message::f_string<DBUS_TYPE_STRING>>())
+		(L"object_path"sv, t_member<t_pvalue(t_message::*)(std::wstring_view), &t_message::f_string<DBUS_TYPE_OBJECT_PATH>>())
+		(L"signature"sv, t_member<t_pvalue(t_message::*)(std::wstring_view), &t_message::f_string<DBUS_TYPE_SIGNATURE>>())
+		(L"array"sv, t_member<t_pvalue(t_message::*)(std::wstring_view, const t_pvalue&), &t_message::f_container<DBUS_TYPE_ARRAY>>())
+		(L"variant"sv, t_member<t_pvalue(t_message::*)(std::wstring_view, const t_pvalue&), &t_message::f_container<DBUS_TYPE_VARIANT>>())
+		(L"struct"sv, t_member<t_pvalue(t_message::*)(const t_pvalue&), &t_message::f_container<DBUS_TYPE_STRUCT>>())
+		(L"dict_entry"sv, t_member<t_pvalue(t_message::*)(const t_pvalue&), &t_message::f_container<DBUS_TYPE_DICT_ENTRY>>())
 	.f_derive<t_message, t_object>();
 }
 

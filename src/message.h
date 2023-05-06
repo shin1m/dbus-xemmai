@@ -93,72 +93,33 @@ public:
 		}
 		return t_object::f_of(this);
 	}
-	t_pvalue f_append(bool a_value)
+	t_pvalue f_boolean(bool a_value)
 	{
 		dbus_bool_t value = a_value ? TRUE : FALSE;
 		return f_append(DBUS_TYPE_BOOLEAN, &value);
 	}
-	t_pvalue f_append(int a_type, intptr_t a_value)
+	template<int A_type, typename T_value>
+	t_pvalue f_number(T_value a_value)
 	{
-		switch (a_type) {
-		case DBUS_TYPE_BYTE:
-		case DBUS_TYPE_INT16:
-		case DBUS_TYPE_UINT16:
-		case DBUS_TYPE_INT32:
-		case DBUS_TYPE_UINT32:
-		case DBUS_TYPE_INT64:
-		case DBUS_TYPE_UINT64:
-			return f_append(a_type, &a_value);
-		default:
-			f_throw(L"invalid type."sv);
-		}
+		return f_append(A_type, &a_value);
 	}
-	t_pvalue f_append(intptr_t a_value)
+	template<int A_type>
+	t_pvalue f_string(std::wstring_view a_value)
 	{
-		return f_append(DBUS_TYPE_INT32, a_value);
-	}
-	t_pvalue f_append(double a_value)
-	{
-		return f_append(DBUS_TYPE_DOUBLE, &a_value);
-	}
-	t_pvalue f_append(int a_type, std::wstring_view a_value)
-	{
-		switch (a_type) {
-		case DBUS_TYPE_STRING:
-		case DBUS_TYPE_OBJECT_PATH:
-		case DBUS_TYPE_SIGNATURE:
-			break;
-		default:
-			f_throw(L"invalid type."sv);
-		}
 		std::string value = f_convert(a_value);
-		const char* p = value.c_str();
-		return f_append(a_type, &p);
-	}
-	t_pvalue f_append(std::wstring_view a_value)
-	{
-		return f_append(DBUS_TYPE_STRING, a_value);
+		auto p = value.c_str();
+		return f_append(A_type, &p);
 	}
 	t_pvalue f_append(int a_type, const char* a_signature, const t_pvalue& a_callable);
-	t_pvalue f_append(int a_type, std::wstring_view a_signature, const t_pvalue& a_callable)
+	template<int A_type>
+	t_pvalue f_container(std::wstring_view a_signature, const t_pvalue& a_callable)
 	{
-		switch (a_type) {
-		case DBUS_TYPE_ARRAY:
-		case DBUS_TYPE_VARIANT:
-			return f_append(a_type, f_convert(a_signature).c_str(), a_callable);
-		default:
-			f_throw(L"invalid type."sv);
-		}
+		return f_append(A_type, f_convert(a_signature).c_str(), a_callable);
 	}
-	t_pvalue f_append(int a_type, const t_pvalue& a_callable)
+	template<int A_type>
+	t_pvalue f_container(const t_pvalue& a_callable)
 	{
-		switch (a_type) {
-		case DBUS_TYPE_STRUCT:
-		case DBUS_TYPE_DICT_ENTRY:
-			return f_append(a_type, NULL, a_callable);
-		default:
-			f_throw(L"invalid type."sv);
-		}
+		return f_append(A_type, NULL, a_callable);
 	}
 };
 
