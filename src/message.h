@@ -98,8 +98,8 @@ public:
 		dbus_bool_t value = a_value ? TRUE : FALSE;
 		return f_append(DBUS_TYPE_BOOLEAN, &value);
 	}
-	template<int A_type, typename T_value>
-	t_pvalue f_number(T_value a_value)
+	template<int A_type>
+	t_pvalue f_number(auto a_value)
 	{
 		return f_append(A_type, &a_value);
 	}
