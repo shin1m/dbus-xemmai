@@ -16,8 +16,8 @@ dbus.main(@
 			xs[0]
 		finally
 			message.release(
-			reply !== null && reply.release(
-			result !== null && result.release(
+			reply && reply.release(
+			result && result.release(
 	assert(call(dbus.Message(
 		"org.freedesktop.DBus"
 		"/org/freedesktop/DBus"
