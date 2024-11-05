@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
-project(dbus-xemmai VERSION 202402)
-find_package(xemmai 202402 REQUIRED)
+project(dbus-xemmai VERSION 202411)
+find_package(xemmai 202411 REQUIRED)
 find_package(DBus1 1.8 REQUIRED)
 add_subdirectory(src)
 enable_testing()
