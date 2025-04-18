@@ -24,8 +24,8 @@ void t_type_of<xemmaix::dbus::t_reply>::f_define(t_library* a_library)
 {
 	using namespace xemmaix::dbus;
 	t_define{a_library}
-		(L"acquire"sv, t_member<void(t_reply::*)(), &t_reply::f_acquire>())
-		(L"release"sv, t_member<void(t_reply::*)(), &t_reply::f_release>())
+	(L"acquire"sv, t_member<void(t_reply::*)(), &t_reply::f_acquire>())
+	(L"release"sv, t_member<void(t_reply::*)(), &t_reply::f_release>())
 	.f_derive<t_reply, t_object>();
 }
 

@@ -73,16 +73,16 @@ void t_type_of<xemmaix::dbus::t_connection>::f_define(t_library* a_library)
 {
 	using namespace xemmaix::dbus;
 	t_define{a_library}
-		(L"acquire"sv, t_member<void(t_connection::*)(), &t_connection::f_acquire>())
-		(L"release"sv, t_member<void(t_connection::*)(), &t_connection::f_release>())
-		(L"send"sv, t_member<void(t_connection::*)(t_message&), &t_connection::f_send>())
-		(L"send_with_reply"sv, t_member<t_pvalue(t_connection::*)(t_message&), &t_connection::f_send_with_reply>())
-		(L"add_disconnected"sv, t_member<void(t_connection::*)(const t_pvalue&), &t_connection::f_add_disconnected>())
-		(L"remove_disconnected"sv, t_member<void(t_connection::*)(const t_pvalue&), &t_connection::f_remove_disconnected>())
-		(L"request_name"sv, t_member<int(t_connection::*)(std::wstring_view, unsigned int), &t_connection::f_request_name>())
-		(L"release_name"sv, t_member<int(t_connection::*)(std::wstring_view), &t_connection::f_release_name>())
-		(L"add_match"sv, t_member<void(t_connection::*)(int, std::wstring_view, std::wstring_view, std::wstring_view, const t_pvalue&), &t_connection::f_add_match>())
-		(L"remove_match"sv, t_member<void(t_connection::*)(int, std::wstring_view, std::wstring_view, std::wstring_view), &t_connection::f_remove_match>())
+	(L"acquire"sv, t_member<void(t_connection::*)(), &t_connection::f_acquire>())
+	(L"release"sv, t_member<void(t_connection::*)(), &t_connection::f_release>())
+	(L"send"sv, t_member<void(t_connection::*)(t_message&), &t_connection::f_send>())
+	(L"send_with_reply"sv, t_member<t_pvalue(t_connection::*)(t_message&), &t_connection::f_send_with_reply>())
+	(L"add_disconnected"sv, t_member<void(t_connection::*)(const t_pvalue&), &t_connection::f_add_disconnected>())
+	(L"remove_disconnected"sv, t_member<void(t_connection::*)(const t_pvalue&), &t_connection::f_remove_disconnected>())
+	(L"request_name"sv, t_member<int(t_connection::*)(std::wstring_view, unsigned int), &t_connection::f_request_name>())
+	(L"release_name"sv, t_member<int(t_connection::*)(std::wstring_view), &t_connection::f_release_name>())
+	(L"add_match"sv, t_member<void(t_connection::*)(int, std::wstring_view, std::wstring_view, std::wstring_view, const t_pvalue&), &t_connection::f_add_match>())
+	(L"remove_match"sv, t_member<void(t_connection::*)(int, std::wstring_view, std::wstring_view, std::wstring_view), &t_connection::f_remove_match>())
 	.f_derive<t_connection, t_object>();
 }
 
