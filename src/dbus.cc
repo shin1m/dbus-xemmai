@@ -71,10 +71,7 @@ void f_main(t_library* a_library, const t_pvalue& a_callable)
 
 void t_library::f_scan(t_scan a_scan)
 {
-	a_scan(v_type_message);
-	a_scan(v_type_reply);
-	a_scan(v_type_bus_type);
-	a_scan(v_type_connection);
+	XEMMAIX__DBUS__TYPES(XEMMAI__TYPE__SCAN)
 }
 
 std::vector<std::pair<t_root, t_rvalue>> t_library::f_define()

@@ -220,10 +220,12 @@ void t_proxy_of<T, T_value>::f_dispose()
 
 class t_library : public xemmai::t_library
 {
-	t_slot_of<t_type> v_type_message;
-	t_slot_of<t_type> v_type_reply;
-	t_slot_of<t_type> v_type_bus_type;
-	t_slot_of<t_type> v_type_connection;
+#define XEMMAIX__DBUS__TYPES(_)\
+	_(message)\
+	_(reply)\
+	_##_AS(DBusBusType, bus_type)\
+	_(connection)
+	XEMMAIX__DBUS__TYPES(XEMMAI__TYPE__DECLARE)
 
 public:
 	using xemmai::t_library::t_library;
@@ -231,10 +233,9 @@ public:
 };
 
 XEMMAI__LIBRARY__BASE(t_library, t_global, f_global())
-XEMMAI__LIBRARY__TYPE(t_library, message)
-XEMMAI__LIBRARY__TYPE(t_library, reply)
-XEMMAI__LIBRARY__TYPE_AS(t_library, DBusBusType, bus_type)
-XEMMAI__LIBRARY__TYPE(t_library, connection)
+#define XEMMAI__TYPE__LIBRARY t_library
+XEMMAIX__DBUS__TYPES(XEMMAI__TYPE__DEFINE)
+#undef XEMMAI__TYPE__LIBRARY
 
 template<typename T>
 struct t_holds : t_bears<T>
