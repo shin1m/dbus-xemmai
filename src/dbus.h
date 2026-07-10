@@ -117,14 +117,18 @@ public:
 class t_proxy : public t_entry
 {
 	t_session* v_session = t_session::f_instance();
-	t_root v_object = t_object::f_of(this);
+	t_root v_object;
 
 protected:
 	static void f_destroy(void* a_p)
 	{
 		static_cast<t_proxy*>(a_p)->f_destroy();
 	}
-	static t_pvalue f_transfer(t_object* a_value)
+	static t_object* f_own(t_object* a_value)
+	{
+		return a_value->f_as<t_proxy>().v_object = a_value;
+	}
+	static t_object* f_transfer(t_object* a_value)
 	{
 		++a_value->f_as<t_proxy>().v_n;
 		return a_value;
@@ -149,15 +153,13 @@ protected:
 	using t_base = t_proxy_of;
 
 	template<typename T_type>
-	static t_pvalue f_construct_shared(t_type* a_class, T_value* a_value)
+	static t_object* f_construct_shared(t_type* a_class, T_value* a_value)
 	{
-		T* p = f_from(a_value);
-		if (p) {
+		if (T* p = f_from(a_value)) {
 			if (p->v_n > 0) T::f_unreference(a_value);
 			return f_transfer(t_object::f_of(p));
-		} else {
-			return f_transfer(a_class->f_new<T_type>(a_value));
 		}
+		return f_own(f_transfer(a_class->f_new<T_type>(a_value)));
 	}
 
 	T_value* v_value;
@@ -175,9 +177,9 @@ public:
 	{
 		return static_cast<T*>(T::f_get_data(a_value, v_slot));
 	}
-	static t_pvalue f_construct(t_type* a_class, T_value* a_value)
+	static t_object* f_construct(t_type* a_class, T_value* a_value)
 	{
-		return f_transfer(a_class->f_new<T>(a_value));
+		return f_transfer(f_own(a_class->f_new<T>(a_value)));
 	}
 
 	virtual void f_dispose();

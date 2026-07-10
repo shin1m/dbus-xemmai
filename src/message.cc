@@ -143,10 +143,10 @@ void t_type_of<xemmaix::dbus::t_message>::f_define(t_library* a_library)
 t_pvalue t_type_of<xemmaix::dbus::t_message>::f_do_construct(t_pvalue* a_stack, size_t a_n)
 {
 	return t_overload<
-		t_construct_with<t_pvalue(*)(t_type*, const t_string*, std::wstring_view, const t_string*, std::wstring_view), xemmaix::dbus::t_message::f_construct>,
-		t_construct_with<t_pvalue(*)(t_type*, xemmaix::dbus::t_message&), xemmaix::dbus::t_message::f_construct>,
-		t_construct_with<t_pvalue(*)(t_type*, std::wstring_view, std::wstring_view, std::wstring_view), xemmaix::dbus::t_message::f_construct>,
-		t_construct_with<t_pvalue(*)(t_type*, xemmaix::dbus::t_message&, std::wstring_view, const t_string*), xemmaix::dbus::t_message::f_construct>
+		t_construct_with<t_object*(*)(t_type*, const t_string*, std::wstring_view, const t_string*, std::wstring_view), xemmaix::dbus::t_message::f_construct>,
+		t_construct_with<t_object*(*)(t_type*, xemmaix::dbus::t_message&), xemmaix::dbus::t_message::f_construct>,
+		t_construct_with<t_object*(*)(t_type*, std::wstring_view, std::wstring_view, std::wstring_view), xemmaix::dbus::t_message::f_construct>,
+		t_construct_with<t_object*(*)(t_type*, xemmaix::dbus::t_message&, std::wstring_view, const t_string*), xemmaix::dbus::t_message::f_construct>
 	>::t_bind<xemmaix::dbus::t_message>::f_do(this, a_stack, a_n);
 }
 

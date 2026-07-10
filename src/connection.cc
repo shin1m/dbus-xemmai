@@ -76,7 +76,7 @@ void t_type_of<xemmaix::dbus::t_connection>::f_define(t_library* a_library)
 	(L"acquire"sv, t_member<void(t_connection::*)(), &t_connection::f_acquire>())
 	(L"release"sv, t_member<void(t_connection::*)(), &t_connection::f_release>())
 	(L"send"sv, t_member<void(t_connection::*)(t_message&), &t_connection::f_send>())
-	(L"send_with_reply"sv, t_member<t_pvalue(t_connection::*)(t_message&), &t_connection::f_send_with_reply>())
+	(L"send_with_reply"sv, t_member<t_object*(t_connection::*)(t_message&), &t_connection::f_send_with_reply>())
 	(L"add_disconnected"sv, t_member<void(t_connection::*)(const t_pvalue&), &t_connection::f_add_disconnected>())
 	(L"remove_disconnected"sv, t_member<void(t_connection::*)(const t_pvalue&), &t_connection::f_remove_disconnected>())
 	(L"request_name"sv, t_member<int(t_connection::*)(std::wstring_view, unsigned int), &t_connection::f_request_name>())
@@ -89,8 +89,8 @@ void t_type_of<xemmaix::dbus::t_connection>::f_define(t_library* a_library)
 t_pvalue t_type_of<xemmaix::dbus::t_connection>::f_do_construct(t_pvalue* a_stack, size_t a_n)
 {
 	return t_overload<
-		t_construct_with<t_pvalue(*)(t_type*, DBusBusType), xemmaix::dbus::t_connection::f_construct>,
-		t_construct_with<t_pvalue(*)(t_type*, std::wstring_view), xemmaix::dbus::t_connection::f_construct>
+		t_construct_with<t_object*(*)(t_type*, DBusBusType), xemmaix::dbus::t_connection::f_construct>,
+		t_construct_with<t_object*(*)(t_type*, std::wstring_view), xemmaix::dbus::t_connection::f_construct>
 	>::t_bind<xemmaix::dbus::t_connection>::f_do(this, a_stack, a_n);
 }
 

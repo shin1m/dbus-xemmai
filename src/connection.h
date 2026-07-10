@@ -67,11 +67,10 @@ public:
 	static t_object* f_wrap(DBusConnection* a_value)
 	{
 		if (!a_value) return {};
-		t_connection* p = f_from(a_value);
-		if (p) return t_object::f_of(p);
-		return f_new<t_connection>(t_session::f_instance()->f_library(), a_value);
+		if (auto p = f_from(a_value)) return t_object::f_of(p);
+		return f_own(f_new<t_connection>(t_session::f_instance()->f_library(), a_value));
 	}
-	static t_pvalue f_construct(t_type* a_class, DBusBusType a_type)
+	static t_object* f_construct(t_type* a_class, DBusBusType a_type)
 	{
 		DBusError error;
 		dbus_error_init(&error);
@@ -84,7 +83,7 @@ public:
 		dbus_connection_set_exit_on_disconnect(p, FALSE);
 		return f_construct_shared<t_connection>(a_class, p);
 	}
-	static t_pvalue f_construct(t_type* a_class, std::wstring_view a_address)
+	static t_object* f_construct(t_type* a_class, std::wstring_view a_address)
 	{
 		DBusError error;
 		dbus_error_init(&error);
@@ -109,7 +108,7 @@ public:
 	{
 		if (dbus_connection_send(v_value, a_message, NULL) == FALSE) f_throw(L"dbus_connection_send failed."sv);
 	}
-	t_pvalue f_send_with_reply(t_message& a_message)
+	t_object* f_send_with_reply(t_message& a_message)
 	{
 		DBusPendingCall* p;
 		if (dbus_connection_send_with_reply(v_value, a_message, &p, DBUS_TIMEOUT_USE_DEFAULT) == FALSE) f_throw(L"dbus_connection_send_with_reply failed."sv);

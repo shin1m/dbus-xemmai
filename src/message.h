@@ -37,36 +37,35 @@ public:
 	static t_object* f_wrap(DBusMessage* a_value)
 	{
 		if (!a_value) return {};
-		t_message* p = f_from(a_value);
-		if (p) return t_object::f_of(p);
-		return f_new<t_message>(t_session::f_instance()->f_library(), a_value);
+		if (auto p = f_from(a_value)) return t_object::f_of(p);
+		return f_own(f_new<t_message>(t_session::f_instance()->f_library(), a_value));
 	}
 	using t_base::f_construct;
-	static t_pvalue f_construct(t_type* a_class, const t_string* a_destination, std::wstring_view a_path, const t_string* a_interface, std::wstring_view a_method)
+	static t_object* f_construct(t_type* a_class, const t_string* a_destination, std::wstring_view a_path, const t_string* a_interface, std::wstring_view a_method)
 	{
 		DBusMessage* p = dbus_message_new_method_call(a_destination ? f_convert(*a_destination).c_str() : NULL, f_convert(a_path).c_str(), a_interface ? f_convert(*a_interface).c_str() : NULL, f_convert(a_method).c_str());
 		if (p == NULL) f_throw(L"dbus_message_new_method_call failed."sv);
 		return f_construct(a_class, p);
 	}
-	static t_pvalue f_construct(t_type* a_class, t_message& a_call)
+	static t_object* f_construct(t_type* a_class, t_message& a_call)
 	{
 		DBusMessage* p = dbus_message_new_method_return(a_call);
 		if (p == NULL) f_throw(L"dbus_message_new_method_return failed."sv);
 		return f_construct(a_class, p);
 	}
-	static t_pvalue f_construct(t_type* a_class, std::wstring_view a_path, std::wstring_view a_interface, std::wstring_view a_name)
+	static t_object* f_construct(t_type* a_class, std::wstring_view a_path, std::wstring_view a_interface, std::wstring_view a_name)
 	{
 		DBusMessage* p = dbus_message_new_signal(f_convert(a_path).c_str(), f_convert(a_interface).c_str(), f_convert(a_name).c_str());
 		if (p == NULL) f_throw(L"dbus_message_new_signal failed."sv);
 		return f_construct(a_class, p);
 	}
-	static t_pvalue f_construct(t_type* a_class, t_message& a_to, std::wstring_view a_name, const t_string* a_message)
+	static t_object* f_construct(t_type* a_class, t_message& a_to, std::wstring_view a_name, const t_string* a_message)
 	{
 		DBusMessage* p = dbus_message_new_error(a_to, f_convert(a_name).c_str(), a_message ? f_convert(*a_message).c_str() : NULL);
 		if (p == NULL) f_throw(L"dbus_message_new_error failed."sv);
 		return f_construct(a_class, p);
 	}
-	static t_pvalue f_construct(DBusMessage* a_value)
+	static t_object* f_construct(DBusMessage* a_value)
 	{
 		return f_construct(t_session::f_instance()->f_library()->f_type<t_message>(), a_value);
 	}

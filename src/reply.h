@@ -27,7 +27,7 @@ class t_reply : public t_proxy_of<t_reply, DBusPendingCall>
 	{
 		dbus_pending_call_unref(a_value);
 	}
-	static t_pvalue f_steal(DBusPendingCall* a_value)
+	static t_object* f_steal(DBusPendingCall* a_value)
 	{
 		auto message = dbus_pending_call_steal_reply(a_value);
 		if (message == NULL) f_throw(L"dbus_pending_call_steal_reply failed."sv);
@@ -43,9 +43,9 @@ class t_reply : public t_proxy_of<t_reply, DBusPendingCall>
 	virtual void f_destroy();
 
 public:
-	static t_pvalue f_construct(DBusPendingCall* a_value, DBusConnection* a_connection)
+	static t_object* f_construct(DBusPendingCall* a_value, DBusConnection* a_connection)
 	{
-		return a_value == NULL ? nullptr : f_transfer(f_new<t_reply>(t_session::f_instance()->f_library(), a_value, a_connection));
+		return a_value ? f_transfer(f_own(f_new<t_reply>(t_session::f_instance()->f_library(), a_value, a_connection))) : nullptr;
 	}
 
 	virtual void f_dispose();
@@ -57,7 +57,7 @@ public:
 	{
 		t_base::f_release();
 	}
-	t_pvalue operator()()
+	t_object* operator()()
 	{
 		dbus_pending_call_block(v_value);
 		return f_steal(v_value);
